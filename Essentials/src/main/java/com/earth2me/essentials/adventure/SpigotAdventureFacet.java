@@ -90,6 +90,11 @@ public class SpigotAdventureFacet implements AdventureFacet {
     }
 
     @Override
+    public void sendActionBar(Player player, ComponentHolder component) {
+        bukkitAudiences.player(player).sendActionBar((Component) component.getComponent());
+    }
+
+    @Override
     public String adventureToLegacy(ComponentHolder component) {
         return adventureToLegacy((Component) component.getComponent());
     }

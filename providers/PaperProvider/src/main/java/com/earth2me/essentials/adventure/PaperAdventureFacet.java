@@ -75,6 +75,11 @@ public class PaperAdventureFacet implements AdventureFacet {
     }
 
     @Override
+    public void sendActionBar(Player player, ComponentHolder component) {
+        player.sendActionBar((Component) component.getComponent());
+    }
+
+    @Override
     public String legacyToMini(String message) {
         return legacyToMini(message, true);
     }

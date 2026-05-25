@@ -472,38 +472,6 @@ public class EssentialsUpgrade {
         ess.getLogger().info("Done converting ignore list.");
     }
 
-    public void convertKits() {
-        if (Essentials.TESTING) {
-            return;
-        }
-
-        final Kits kits = ess.getKits();
-        final EssentialsConfiguration config = kits.getRootConfig();
-        if (doneFile.getBoolean("kitsyml", false)) {
-            return;
-        }
-
-        ess.getLogger().info("Attempting to convert old kits in config.yml to new kits.yml");
-
-        final CommentedConfigurationNode section = ess.getSettings().getKitSection();
-        if (section == null) {
-            ess.getLogger().info("No kits found to migrate.");
-            return;
-        }
-
-        final Map<String, Object> legacyKits = ConfigurateUtil.getRawMap(section);
-
-        for (final Map.Entry<String, Object> entry : legacyKits.entrySet()) {
-            ess.getLogger().info("Converting " + entry.getKey());
-            config.setRaw("kits." + entry.getKey(), entry.getValue());
-        }
-
-        config.save();
-        doneFile.setProperty("kitsyml", true);
-        doneFile.save();
-        ess.getLogger().info("Done converting kits.");
-    }
-
     private void moveMotdRulesToFile(final String name) {
         if (doneFile.getBoolean("move" + name + "ToFile", false)) {
             return;

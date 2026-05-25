@@ -10,6 +10,11 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import net.ess3.api.IEssentials;
 import net.ess3.api.IUser;
 import net.essentialsx.api.v2.events.TeleportWarmupCancelledEvent.CancelReason;
+import com.earth2me.essentials.adventure.ComponentHolder;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class AsyncTimedTeleport implements Runnable {
     private static final double MOVE_CONSTANT = 0.3;
@@ -121,6 +126,20 @@ public class AsyncTimedTeleport implements Runnable {
                         cancelTimer(false);
                         teleportUser.sendTl("teleportationCommencing");
 
+                        final ISettings settings = ess.getSettings();
+                        if (settings.isTeleportFeedbackSoundsEnabled()) {
+                            final String successSound = settings.getTeleportFeedbackSoundSuccess();
+                            final float successVol = settings.getTeleportFeedbackSoundSuccessVolume();
+                            final float successPitch = settings.getTeleportFeedbackSoundSuccessPitch();
+                            if (successSound != null && !successSound.isEmpty()) {
+                                ess.scheduleEntityDelayedTask(teleportUser.getBase(), () -> {
+                                    if (teleportUser.getBase().isOnline()) {
+                                        teleportUser.getBase().playSound(teleportUser.getBase().getLocation(), successSound, successVol, successPitch);
+                                    }
+                                }, 2L);
+                            }
+                        }
+
                         if (timer_chargeFor != null) {
                             timer_chargeFor.isAffordableFor(teleportOwner);
                         }
@@ -142,6 +161,22 @@ public class AsyncTimedTeleport implements Runnable {
 
                     } catch (final Exception ex) {
                         ess.showError(teleportOwner.getSource(), ex, "\\ teleport");
+                    }
+                } else {
+                    final long remainingMillis = (timer_started + timer_delay) - now;
+                    final long remainingSecs = Math.max(1, (remainingMillis + 999) / 1000);
+                    final ISettings settings = ess.getSettings();
+                    if (settings.isTeleportFeedbackActionBarEnabled()) {
+                        final String format = settings.getTeleportFeedbackActionBarFormat();
+                        ess.getAdventureFacet().sendActionBar(teleportUser.getBase(), parseFormat(format, String.valueOf(remainingSecs)));
+                    }
+                    if (settings.isTeleportFeedbackSoundsEnabled()) {
+                        final String warmupSound = settings.getTeleportFeedbackSoundWarmup();
+                        final float warmupVol = settings.getTeleportFeedbackSoundWarmupVolume();
+                        final float warmupPitch = settings.getTeleportFeedbackSoundWarmupPitch();
+                        if (warmupSound != null && !warmupSound.isEmpty()) {
+                            teleportUser.getBase().playSound(teleportUser.getBase().getLocation(), warmupSound, warmupVol, warmupPitch);
+                        }
                     }
                 }
             }
@@ -170,9 +205,41 @@ public class AsyncTimedTeleport implements Runnable {
                 if (timer_teleportee != null && !timer_teleportee.equals(teleportOwner.getBase().getUniqueId())) {
                     ess.getUser(timer_teleportee).sendTl("pendingTeleportCancelled");
                 }
+                final IUser tUser = ess.getUser(this.timer_teleportee);
+                if (tUser != null && tUser.getBase() != null && tUser.getBase().isOnline()) {
+                    final ISettings settings = ess.getSettings();
+                    if (settings.isTeleportFeedbackSoundsEnabled()) {
+                        final String cancelSound = settings.getTeleportFeedbackSoundCancel();
+                        final float cancelVol = settings.getTeleportFeedbackSoundCancelVolume();
+                        final float cancelPitch = settings.getTeleportFeedbackSoundCancelPitch();
+                        if (cancelSound != null && !cancelSound.isEmpty()) {
+                            tUser.getBase().playSound(tUser.getBase().getLocation(), cancelSound, cancelVol, cancelPitch);
+                        }
+                    }
+                }
             }
         } finally {
             timer_task = null;
         }
+    }
+
+    private static final Pattern TAG_PATTERN = Pattern.compile("<[^>]+>");
+
+    private ComponentHolder parseFormat(final String format, final String remainingSecs) {
+        final String replacedTime = format.replace("{time}", remainingSecs);
+        final Matcher matcher = TAG_PATTERN.matcher(replacedTime);
+        final List<String> tags = new ArrayList<>();
+        final StringBuffer sb = new StringBuffer();
+        while (matcher.find()) {
+            tags.add(matcher.group());
+            matcher.appendReplacement(sb, "%%TAG_" + (tags.size() - 1) + "%%");
+        }
+        matcher.appendTail(sb);
+        final String legacyReplaced = com.earth2me.essentials.utils.FormatUtil.replaceFormat(sb.toString());
+        String miniMessageStr = ess.getAdventureFacet().legacyToMini(legacyReplaced);
+        for (int i = 0; i < tags.size(); i++) {
+            miniMessageStr = miniMessageStr.replace("%%TAG_" + i + "%%", tags.get(i));
+        }
+        return ess.getAdventureFacet().deserializeMiniMessage(miniMessageStr);
     }
 }

@@ -97,10 +97,7 @@ commands:
     description: Describes your current bearing.
     usage: /<command>
     aliases: [ecompass,direction,edirection]
-  createkit:
-    description: Create a kit in game!
-    usage: /<command> <kitname> <delay>
-    aliases: [kitcreate,createk,kc,ck]
+
   customtext:
     description: Allows you to create custom text commands.
     usage: /<alias> - Define in bukkit.yml
@@ -112,10 +109,7 @@ commands:
     description: Removes a jail.
     usage: /<command> <jailname>
     aliases: [edeljail,remjail,eremjail,rmjail,ermjail]
-  delkit:
-    description: Deletes the specified kit.
-    usage: /<command> <kit>
-    aliases: [edelkit,remkit,eremkit,rmkit,ermkit,deletekit,edeletekit]
+
   delwarp:
     description: Deletes the specified warp.
     usage: /<command> <warp>
@@ -264,14 +258,7 @@ commands:
     description: Kills specified player.
     usage: /<command> <player>
     aliases: [ekill]
-  kit:
-    description: Obtains the specified kit or views all available kits.
-    usage: /<command> [kit] [player]
-    aliases: [ekit,kits,ekits]
-  kitreset:
-    description: Resets the cooldown on the specified kit.
-    usage: /<command> <kit> [player]
-    aliases: [ekitreset, kitr, ekitr, resetkit, eresetkit]
+
   kittycannon:
     description: Throw an exploding kitten at your opponent.
     usage: /<command>
@@ -440,10 +427,7 @@ commands:
     description: Set the sell value of an item.
     usage: /<command> [itemname|id] <price>
     aliases: [esetworth]
-  showkit:
-    description: Show contents of a kit.
-    usage: /<command> <kitname>
-    aliases: [kitpreview,preview,kitshow]
+
   editsign:
     description: Edits a sign in the world.
     usage: /<command> <set/clear/copy/paste> [line number] [text]
@@ -723,14 +707,7 @@ permissions:
     description: Allows access to the /compass command
   essentials.condense:
     description: Allows access to the /condense command
-  essentials.createkit:
-    description: Allows access to the /createkit command
-  essentials.delkit:
-    description: Allows access to the /delkit command
-  essentials.kitreset:
-    description: Allows access to the /kitreset command
-  essentials.kitreset.others:
-    description: Allows access to reset other players kits with the /kitreset command
+
   essentials.customtext:
     description: Allows access to the /customtext command and all aliases
   essentials.delwarp:
@@ -982,17 +959,7 @@ permissions:
     description: Allows access to the /kickall command
   essentials.kickall.exempt:
     description: Prevents the player from being kicked by /kickall
-  essentials.kit:
-    description: Allows access to the /kit command
-  essentials.kit.exemptdelay:
-    default: false
-    description: Exempts you from the kit delay feature, this affects signs as well as command.
-  essentials.kit.others:
-    description: Allows access to the /kit command for other players
-  essentials.kits.*:
-    description: Allows access to all kits
-  essentials.kits.<kit-name>:
-    description: Allows access to a specific kit
+
   essentials.kittycannon:
     description: Allows access to the /kittycannon command
   essentials.beezooka:

@@ -111,6 +111,30 @@ teleport-cooldown: 0
 # If the player moves or gets attacked in this timeframe, the teleport is cancelled.
 teleport-delay: 0
 
+# Visual and audio feedback during teleport delay.
+teleport-feedback:
+  actionbar:
+    enabled: true
+    # Use {time} for remaining seconds.
+    format: "&eTeleporting in &c{time}s&e. Don't move!"
+  sounds:
+    enabled: true
+    # Sound played each second during warmup
+    warmup:
+      sound: "block.note_block.pling"
+      volume: 1.0
+      pitch: 0.8
+    # Sound played when teleportation is successful
+    success:
+      sound: "entity.enderman.teleport"
+      volume: 1.0
+      pitch: 1.0
+    # Sound played when teleportation is cancelled (e.g. player moved or was damaged)
+    cancel:
+      sound: "block.anvil.land"
+      volume: 1.0
+      pitch: 1.0
+
 # The delay, in seconds, during which a player can't be attacked by other players after being teleported by a command.
 # This also prevents the player from attacking others.
 teleport-invulnerability: 4
@@ -288,8 +312,6 @@ player-commands:
   - ignore
   - info
   - itemdb
-  - kit
-  - kits.tools
   - list
   - mail
   - mail.send
@@ -322,7 +344,6 @@ player-commands:
   - signs.use.gamemode
   - signs.use.heal
   - signs.use.info
-  - signs.use.kit
   - signs.use.mail
   - signs.use.protection
   - signs.use.repair
@@ -349,25 +370,7 @@ player-commands:
 # If you wish to use Essentials' built-in permissions using the 'player-commands' section above, set this to false.
 use-bukkit-permissions: true
 
-# When this option is enabled, one-time use kits (i.e., delay < 0) will be
-# removed from '/kit list' when a player can no longer use them.
-skip-used-one-time-kits-from-kit-list: false
-
-# When enabled, armor from kits will automatically be equipped as long as the player's armor slots are empty.
-kit-auto-equip: false
-
-# Determines the functionality of the /createkit command.
-# If this is true, /createkit will give the user a link with the kit code.
-# If this is false, /createkit will add the kit to the 'kits.yml' config file directly.
-pastebin-createkit: false
-
-# Determines if /createkit will generate kits using NBT item serialization.
-# If this is true, /createkit will store items as NBT. Otherwise, it will use Essentials' human-readable item format.
-# By using NBT serialization, /createkit can store items with complex metadata such as shulker boxes and weapons with custom attributes.
-# WARNING: This option only works on 1.15.2+ Paper servers, and it will bypass any custom serializers from other plugins such as Magic.
-# WARNING: When creating kits via /createkit with this option enabled, you will not be able to downgrade your server with these kit items.
-# This option only affects /createkit - you can still create kits by hand in 'kits.yml' using Essentials' human-readable item format.
-use-nbt-serialization-in-createkit: false
+# (Note: Kits feature configuration has been removed)
 
 # To enable signs, remove the # symbol. To disable all signs, comment out or remove each sign.
 # See https://wiki.ess3.net/wiki/Sign_Tutorial for instructions on how to use these.
@@ -385,7 +388,6 @@ enabledSigns:
   #- gamemode
   #- heal
   #- info
-  #- kit
   #- mail
   #- randomteleport
   #- warp
@@ -412,12 +414,11 @@ allow-old-id-signs: false
 
 # List of sign names Essentials should not protect. This feature is especially useful when
 # another plugin provides a sign that Essentials provides, but Essentials overrides.
-# For example, if a plugin provides a [kit] sign, and you wish to use theirs instead of
-# Essentials', then simply add 'kit' below and Essentials will not protect it.
+# For example, if a plugin provides a sign and you wish to use theirs instead of
+# Essentials', then simply add the sign name below and Essentials will not protect it.
 #
 # See https://github.com/drtshock/Essentials/pull/699 for more information.
 unprotected-sign-names:
-  #- kit
 
 # Backup runs a custom batch/bash command at a specified interval.
 # The server will save the world before executing the backup command, and disable
@@ -639,7 +640,7 @@ oversized-stacksize: 64
 # using the permission 'essentials.repair.enchanted'.
 repair-enchanted: true
 
-# Allow "unsafe" enchantments in kits and item spawning.
+# Allow "unsafe" enchantments in item spawning.
 # WARNING: Mixing and over-leveling some enchantments can cause issues with clients, servers, and plugins.
 unsafe-enchantments: false
 
@@ -851,8 +852,6 @@ starting-balance: 0
 command-costs:
   # To make /example cost $1000 PER USE:
   #example: 1000
-  # To make '/kit tools' cost $1500 PER USE:
-  #kit-tools: 1500
 
 # Set this to a currency symbol you want to use.
 # Remember, if you want to use special characters in this document, such as accented letters,
@@ -1255,10 +1254,7 @@ newbies:
   spawnpoint: newbies
 
   # Should players receive items on their first join?
-  # This kit will be given regardless of cost and permissions and won't trigger any kit delay (cooldown).
-  # Set to '' to disable.
-  #kit: ''
-  kit: tools
+  # (Note: Kit feature has been removed. Starter kits can be managed via third-party plugins.)
 
 # What priority should Essentials use for handling respawns?
 # Set this to 'none' if you want vanilla respawning behavior.

@@ -158,6 +158,18 @@ public class Settings implements net.ess3.api.ISettings {
     private Set<String> multiplierPerms;
     private BigDecimal defaultMultiplier;
     private List<String> afkTimeoutCommands = Collections.emptyList();
+    private boolean teleportFeedbackActionBarEnabled;
+    private String teleportFeedbackActionBarFormat;
+    private boolean teleportFeedbackSoundsEnabled;
+    private String teleportFeedbackSoundWarmup;
+    private float teleportFeedbackSoundWarmupVolume;
+    private float teleportFeedbackSoundWarmupPitch;
+    private String teleportFeedbackSoundSuccess;
+    private float teleportFeedbackSoundSuccessVolume;
+    private float teleportFeedbackSoundSuccessPitch;
+    private String teleportFeedbackSoundCancel;
+    private float teleportFeedbackSoundCancelVolume;
+    private float teleportFeedbackSoundCancelPitch;
 
     public Settings(final IEssentials ess) {
         this.ess = ess;
@@ -312,6 +324,66 @@ public class Settings implements net.ess3.api.ISettings {
     @Override
     public double getTeleportDelay() {
         return config.getDouble("teleport-delay", 0);
+    }
+
+    @Override
+    public boolean isTeleportFeedbackActionBarEnabled() {
+        return teleportFeedbackActionBarEnabled;
+    }
+
+    @Override
+    public String getTeleportFeedbackActionBarFormat() {
+        return teleportFeedbackActionBarFormat;
+    }
+
+    @Override
+    public boolean isTeleportFeedbackSoundsEnabled() {
+        return teleportFeedbackSoundsEnabled;
+    }
+
+    @Override
+    public String getTeleportFeedbackSoundWarmup() {
+        return teleportFeedbackSoundWarmup;
+    }
+
+    @Override
+    public float getTeleportFeedbackSoundWarmupVolume() {
+        return teleportFeedbackSoundWarmupVolume;
+    }
+
+    @Override
+    public float getTeleportFeedbackSoundWarmupPitch() {
+        return teleportFeedbackSoundWarmupPitch;
+    }
+
+    @Override
+    public String getTeleportFeedbackSoundSuccess() {
+        return teleportFeedbackSoundSuccess;
+    }
+
+    @Override
+    public float getTeleportFeedbackSoundSuccessVolume() {
+        return teleportFeedbackSoundSuccessVolume;
+    }
+
+    @Override
+    public float getTeleportFeedbackSoundSuccessPitch() {
+        return teleportFeedbackSoundSuccessPitch;
+    }
+
+    @Override
+    public String getTeleportFeedbackSoundCancel() {
+        return teleportFeedbackSoundCancel;
+    }
+
+    @Override
+    public float getTeleportFeedbackSoundCancelVolume() {
+        return teleportFeedbackSoundCancelVolume;
+    }
+
+    @Override
+    public float getTeleportFeedbackSoundCancelPitch() {
+        return teleportFeedbackSoundCancelPitch;
     }
 
     @Override
@@ -524,16 +596,6 @@ public class Settings implements net.ess3.api.ISettings {
     @Override
     public double getHealCooldown() {
         return config.getDouble("heal-cooldown", 0);
-    }
-
-    @Override
-    public CommentedConfigurationNode getKitSection() {
-        return config.getSection("kits");
-    }
-
-    @Override
-    public boolean isSkippingUsedOneTimeKitsFromKitList() {
-        return config.getBoolean("skip-used-one-time-kits-from-kit-list", false);
     }
 
     @Override
@@ -956,6 +1018,19 @@ public class Settings implements net.ess3.api.ISettings {
         multiplierPerms = _getMultiplierPerms();
         defaultMultiplier = _getDefaultMultiplier();
         afkTimeoutCommands = _getAfkTimeoutCommands();
+
+        teleportFeedbackActionBarEnabled = config.getBoolean("teleport-feedback.actionbar.enabled", true);
+        teleportFeedbackActionBarFormat = config.getString("teleport-feedback.actionbar.format", "&eTeleporting in &c{time}s&e. Don't move!");
+        teleportFeedbackSoundsEnabled = config.getBoolean("teleport-feedback.sounds.enabled", true);
+        teleportFeedbackSoundWarmup = config.getString("teleport-feedback.sounds.warmup.sound", "block.note_block.pling");
+        teleportFeedbackSoundWarmupVolume = (float) config.getDouble("teleport-feedback.sounds.warmup.volume", 1.0);
+        teleportFeedbackSoundWarmupPitch = (float) config.getDouble("teleport-feedback.sounds.warmup.pitch", 0.8);
+        teleportFeedbackSoundSuccess = config.getString("teleport-feedback.sounds.success.sound", "entity.enderman.teleport");
+        teleportFeedbackSoundSuccessVolume = (float) config.getDouble("teleport-feedback.sounds.success.volume", 1.0);
+        teleportFeedbackSoundSuccessPitch = (float) config.getDouble("teleport-feedback.sounds.success.pitch", 1.0);
+        teleportFeedbackSoundCancel = config.getString("teleport-feedback.sounds.cancel.sound", "block.anvil.land");
+        teleportFeedbackSoundCancelVolume = (float) config.getDouble("teleport-feedback.sounds.cancel.volume", 1.0);
+        teleportFeedbackSoundCancelPitch = (float) config.getDouble("teleport-feedback.sounds.cancel.pitch", 1.0);
 
         reloadCount.incrementAndGet();
     }
@@ -1921,21 +1996,6 @@ public class Settings implements net.ess3.api.ISettings {
             }
         }
         return newSigns;
-    }
-
-    @Override
-    public boolean isKitAutoEquip() {
-        return config.getBoolean("kit-auto-equip", false);
-    }
-
-    @Override
-    public boolean isPastebinCreateKit() {
-        return config.getBoolean("pastebin-createkit", false);
-    }
-
-    @Override
-    public boolean isUseBetterKits() {
-        return config.getBoolean("use-nbt-serialization-in-createkit", false);
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.earth2me.essentials.spawn;
 
-import com.earth2me.essentials.Kit;
 import com.earth2me.essentials.OfflinePlayerStub;
 import com.earth2me.essentials.User;
 import com.earth2me.essentials.textreader.IText;
@@ -18,7 +17,6 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -144,16 +142,6 @@ class EssentialsSpawnPlayerListener implements Listener {
 
                 for (final String line : output.getLines()) {
                     ess.broadcastMessage(user, line);
-                }
-            }
-
-            final String kitName = ess.getSettings().getNewPlayerKit();
-            if (!kitName.isEmpty()) {
-                try {
-                    final Kit kit = new Kit(kitName.toLowerCase(Locale.ENGLISH), ess);
-                    kit.expandItems(user);
-                } catch (final Exception ex) {
-                    logger.log(Level.WARNING, ex.getMessage());
                 }
             }
 

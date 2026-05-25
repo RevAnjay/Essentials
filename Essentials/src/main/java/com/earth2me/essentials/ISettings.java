@@ -7,7 +7,6 @@ import net.essentialsx.api.v2.ChatType;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.event.EventPriority;
-import org.spongepowered.configurate.CommentedConfigurationNode;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -84,11 +83,6 @@ public interface ISettings extends IConf {
 
     Set<String> getMuteCommands();
 
-    @Deprecated
-    CommentedConfigurationNode getKitSection();
-
-    boolean isSkippingUsedOneTimeKitsFromKitList();
-
     String getLocale();
 
     boolean isPerPlayerLocale();
@@ -144,6 +138,30 @@ public interface ISettings extends IConf {
     double getTeleportCooldown();
 
     double getTeleportDelay();
+
+    boolean isTeleportFeedbackActionBarEnabled();
+
+    String getTeleportFeedbackActionBarFormat();
+
+    boolean isTeleportFeedbackSoundsEnabled();
+
+    String getTeleportFeedbackSoundWarmup();
+
+    float getTeleportFeedbackSoundWarmupVolume();
+
+    float getTeleportFeedbackSoundWarmupPitch();
+
+    String getTeleportFeedbackSoundSuccess();
+
+    float getTeleportFeedbackSoundSuccessVolume();
+
+    float getTeleportFeedbackSoundSuccessPitch();
+
+    String getTeleportFeedbackSoundCancel();
+
+    float getTeleportFeedbackSoundCancelVolume();
+
+    float getTeleportFeedbackSoundCancelPitch();
 
     boolean hidePermissionlessHelp();
 
@@ -375,12 +393,6 @@ public interface ISettings extends IConf {
     NumberFormat getCurrencyFormat();
 
     List<EssentialsSign> getUnprotectedSignNames();
-
-    boolean isKitAutoEquip();
-
-    boolean isPastebinCreateKit();
-
-    boolean isUseBetterKits();
 
     boolean isAllowBulkBuySell();
 

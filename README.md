@@ -8,6 +8,9 @@
 
 This is a fork of Essentials called EssentialsX.
 
+> [!NOTE]
+> This is a custom fork created for my server.
+
 If you are using this, do **NOT** ask Essentials for support.
 
 The official upstream repository for the original Essentials project is at https://github.com/Essentials/Essentials.

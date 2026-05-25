@@ -89,8 +89,6 @@ public interface IEssentials extends Plugin {
 
     Backup getBackup();
 
-    Kits getKits();
-
     RandomTeleport getRandomTeleport();
 
     UpdateChecker getUpdateChecker();

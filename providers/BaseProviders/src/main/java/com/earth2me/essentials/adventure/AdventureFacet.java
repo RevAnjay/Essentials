@@ -12,6 +12,8 @@ public interface AdventureFacet {
 
     void send(Player player, ComponentHolder component);
 
+    void sendActionBar(Player player, ComponentHolder component);
+
     /**
      * Converts a section sign legacy string to a MiniMessage string.
      */
