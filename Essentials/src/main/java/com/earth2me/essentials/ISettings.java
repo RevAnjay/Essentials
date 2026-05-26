@@ -163,6 +163,12 @@ public interface ISettings extends IConf {
 
     float getTeleportFeedbackSoundCancelPitch();
 
+    String getTeleportFeedbackSoundAccept();
+
+    float getTeleportFeedbackSoundAcceptVolume();
+
+    float getTeleportFeedbackSoundAcceptPitch();
+
     boolean hidePermissionlessHelp();
 
     boolean isCommandDisabled(final IEssentialsCommand cmd);

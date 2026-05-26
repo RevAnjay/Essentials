@@ -134,6 +134,12 @@ teleport-feedback:
       sound: "block.anvil.land"
       volume: 1.0
       pitch: 1.0
+    # Sound played when a teleport request is accepted (/tpaccept)
+    accept:
+      sound: "entity.experience_orb.pickup"
+      volume: 1.0
+      pitch: 1.2
+
 
 # The delay, in seconds, during which a player can't be attacked by other players after being teleported by a command.
 # This also prevents the player from attacking others.

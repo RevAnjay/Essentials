@@ -4,6 +4,7 @@ import com.earth2me.essentials.AsyncTeleport;
 import com.earth2me.essentials.IUser;
 import com.earth2me.essentials.Trade;
 import com.earth2me.essentials.User;
+import com.earth2me.essentials.ISettings;
 import net.ess3.api.TranslatableException;
 import net.essentialsx.api.v2.events.TeleportRequestResponseEvent;
 import org.bukkit.Bukkit;
@@ -105,6 +106,21 @@ public class Commandtpaccept extends EssentialsCommand {
 
         final Trade charge = new Trade(this.getName(), ess);
         requester.sendTl("requestAcceptedFrom", user.getDisplayName());
+
+        final ISettings settings = ess.getSettings();
+        if (settings.isTeleportFeedbackSoundsEnabled()) {
+            final String soundName = settings.getTeleportFeedbackSoundAccept();
+            final float vol = settings.getTeleportFeedbackSoundAcceptVolume();
+            final float pitch = settings.getTeleportFeedbackSoundAcceptPitch();
+            if (soundName != null && !soundName.isEmpty()) {
+                if (user.getBase() != null && user.getBase().isOnline()) {
+                    user.getBase().playSound(user.getBase().getLocation(), soundName, vol, pitch);
+                }
+                if (requester.getBase() != null && requester.getBase().isOnline()) {
+                    requester.getBase().playSound(requester.getBase().getLocation(), soundName, vol, pitch);
+                }
+            }
+        }
 
         final CompletableFuture<Boolean> future = getNewExceptionFuture(requester.getSource(), commandLabel);
         future.exceptionally(e -> {

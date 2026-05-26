@@ -170,6 +170,9 @@ public class Settings implements net.ess3.api.ISettings {
     private String teleportFeedbackSoundCancel;
     private float teleportFeedbackSoundCancelVolume;
     private float teleportFeedbackSoundCancelPitch;
+    private String teleportFeedbackSoundAccept;
+    private float teleportFeedbackSoundAcceptVolume;
+    private float teleportFeedbackSoundAcceptPitch;
 
     public Settings(final IEssentials ess) {
         this.ess = ess;
@@ -384,6 +387,21 @@ public class Settings implements net.ess3.api.ISettings {
     @Override
     public float getTeleportFeedbackSoundCancelPitch() {
         return teleportFeedbackSoundCancelPitch;
+    }
+
+    @Override
+    public String getTeleportFeedbackSoundAccept() {
+        return teleportFeedbackSoundAccept;
+    }
+
+    @Override
+    public float getTeleportFeedbackSoundAcceptVolume() {
+        return teleportFeedbackSoundAcceptVolume;
+    }
+
+    @Override
+    public float getTeleportFeedbackSoundAcceptPitch() {
+        return teleportFeedbackSoundAcceptPitch;
     }
 
     @Override
@@ -1031,6 +1049,9 @@ public class Settings implements net.ess3.api.ISettings {
         teleportFeedbackSoundCancel = config.getString("teleport-feedback.sounds.cancel.sound", "block.anvil.land");
         teleportFeedbackSoundCancelVolume = (float) config.getDouble("teleport-feedback.sounds.cancel.volume", 1.0);
         teleportFeedbackSoundCancelPitch = (float) config.getDouble("teleport-feedback.sounds.cancel.pitch", 1.0);
+        teleportFeedbackSoundAccept = config.getString("teleport-feedback.sounds.accept.sound", "entity.experience_orb.pickup");
+        teleportFeedbackSoundAcceptVolume = (float) config.getDouble("teleport-feedback.sounds.accept.volume", 1.0);
+        teleportFeedbackSoundAcceptPitch = (float) config.getDouble("teleport-feedback.sounds.accept.pitch", 1.2);
 
         reloadCount.incrementAndGet();
     }
