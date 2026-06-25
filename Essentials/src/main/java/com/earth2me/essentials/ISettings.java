@@ -6,6 +6,7 @@ import com.earth2me.essentials.textreader.IText;
 import net.essentialsx.api.v2.ChatType;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
 
 import java.io.File;
@@ -138,36 +139,6 @@ public interface ISettings extends IConf {
     double getTeleportCooldown();
 
     double getTeleportDelay();
-
-    boolean isTeleportFeedbackActionBarEnabled();
-
-    String getTeleportFeedbackActionBarFormat();
-
-    boolean isTeleportFeedbackSoundsEnabled();
-
-    String getTeleportFeedbackSoundWarmup();
-
-    float getTeleportFeedbackSoundWarmupVolume();
-
-    float getTeleportFeedbackSoundWarmupPitch();
-
-    String getTeleportFeedbackSoundSuccess();
-
-    float getTeleportFeedbackSoundSuccessVolume();
-
-    float getTeleportFeedbackSoundSuccessPitch();
-
-    String getTeleportFeedbackSoundCancel();
-
-    float getTeleportFeedbackSoundCancelVolume();
-
-    float getTeleportFeedbackSoundCancelPitch();
-
-    String getTeleportFeedbackSoundAccept();
-
-    float getTeleportFeedbackSoundAcceptVolume();
-
-    float getTeleportFeedbackSoundAcceptPitch();
 
     boolean hidePermissionlessHelp();
 
@@ -472,7 +443,42 @@ public interface ISettings extends IConf {
 
     int getBaltopEntryLimit();
 
+    String getDatabaseType();
+
+    String getDatabaseSqliteFile();
+
+    int getDatabaseSqliteBusyTimeoutMs();
+
+    String getDatabaseMysqlHost();
+
+    int getDatabaseMysqlPort();
+
+    String getDatabaseMysqlDatabase();
+
+    String getDatabaseMysqlUsername();
+
+    String getDatabaseMysqlPassword();
+
+    boolean isDatabaseMysqlUseSsl();
+
+    int getDatabasePoolMaximumPoolSize();
+
+    int getDatabasePoolMinimumIdle();
+
+    int getDatabasePoolConnectionTimeoutSeconds();
+
+    int getDatabasePoolIdleTimeoutSeconds();
+
+    int getDatabasePoolMaxLifetimeMinutes();
+
+    String getMessageDeliveryType(String tlKey);
+
+    boolean isMessageSoundsEnabled();
+
+    void playMessageSound(Player player, String tlKey);
+
     enum KeepInvPolicy {
+
         KEEP,
         DELETE,
         DROP

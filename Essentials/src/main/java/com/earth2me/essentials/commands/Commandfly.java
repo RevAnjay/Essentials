@@ -2,7 +2,6 @@ package com.earth2me.essentials.commands;
 
 import com.earth2me.essentials.CommandSource;
 import com.earth2me.essentials.User;
-import com.earth2me.essentials.utils.CommonPlaceholders;
 import net.ess3.api.events.FlyStatusChangeEvent;
 import org.bukkit.Server;
 
@@ -40,9 +39,21 @@ public class Commandfly extends EssentialsToggleCommand {
                 user.getBase().setFlying(false);
             }
 
-            user.sendTl("flyMode", CommonPlaceholders.enableDisable(user.getSource(), enabled), user.getDisplayName());
-            if (!sender.isPlayer() || !sender.getPlayer().equals(user.getBase())) {
-                sender.sendTl("flyMode", CommonPlaceholders.enableDisable(user.getSource(), enabled), user.getDisplayName());
+            final boolean isSelf = sender.isPlayer() && sender.getPlayer().equals(user.getBase());
+            if (isSelf) {
+                if (enabled) {
+                    user.sendTl("flyEnabled");
+                } else {
+                    user.sendTl("flyDisabled");
+                }
+            } else {
+                if (enabled) {
+                    user.sendTl("flyEnabled");
+                    sender.sendTl("flyEnabledOthers", user.getDisplayName());
+                } else {
+                    user.sendTl("flyDisabled");
+                    sender.sendTl("flyDisabledOthers", user.getDisplayName());
+                }
             }
         }
     }

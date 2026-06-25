@@ -30,6 +30,8 @@ import com.earth2me.essentials.commands.NotEnoughArgumentsException;
 import com.earth2me.essentials.commands.PlayerNotFoundException;
 import com.earth2me.essentials.commands.QuietAbortException;
 import com.earth2me.essentials.config.EssentialsConfiguration;
+import com.earth2me.essentials.config.EssentialsUserConfiguration;
+import com.earth2me.essentials.storage.DatabaseManager;
 import com.earth2me.essentials.economy.EconomyLayers;
 import com.earth2me.essentials.economy.vault.VaultEconomyProvider;
 import com.earth2me.essentials.items.AbstractItemDb;
@@ -137,6 +139,7 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -178,6 +181,7 @@ public class Essentials extends JavaPlugin implements net.ess3.api.IEssentials {
     @Deprecated
     private transient UserMap legacyUserMap;
     private transient ModernUserMap userMap;
+    private transient DatabaseManager databaseManager;
     private transient BalanceTopImpl balanceTop;
     private transient ExecuteTimer execTimer;
     private transient MailService mail;
@@ -197,6 +201,10 @@ public class Essentials extends JavaPlugin implements net.ess3.api.IEssentials {
     @Override
     public ISettings getSettings() {
         return settings;
+    }
+
+    public DatabaseManager getDatabaseManager() {
+        return databaseManager;
     }
 
     @Override
@@ -277,6 +285,10 @@ public class Essentials extends JavaPlugin implements net.ess3.api.IEssentials {
             settings = new Settings(this);
             confList.add(settings);
             execTimer.mark("Settings");
+
+            EssentialsUserConfiguration.setEssentials(this);
+            databaseManager = new DatabaseManager(this);
+            databaseManager.init();
 
             upgrade.preModules();
             execTimer.mark("Upgrade2");
@@ -472,7 +484,59 @@ public class Essentials extends JavaPlugin implements net.ess3.api.IEssentials {
         }
         if (!TESTING) {
             getBackup().setPendingShutdown(false);
+            runBulkMigration();
         }
+    }
+
+    private void runBulkMigration() {
+        if (databaseManager == null || !databaseManager.isEnabled()) {
+            return;
+        }
+
+        runTaskAsynchronously(() -> {
+            final File userdataFolder = new File(getDataFolder(), "userdata");
+            if (!userdataFolder.exists() || !userdataFolder.isDirectory()) {
+                return;
+            }
+            final File[] files = userdataFolder.listFiles((dir, name) -> name.endsWith(".yml"));
+            if (files == null || files.length == 0) {
+                return;
+            }
+
+            getLogger().info("[Database] Starting bulk migration of " + files.length + " player files...");
+            int migratedCount = 0;
+            int failedCount = 0;
+
+            for (final File file : files) {
+                final String fileName = file.getName();
+                final String uuidStr = fileName.substring(0, fileName.length() - 4);
+                final UUID uuid;
+                try {
+                    uuid = UUID.fromString(uuidStr);
+                } catch (IllegalArgumentException e) {
+                    continue;
+                }
+
+                try {
+                    final EssentialsUserConfiguration userConfig = new EssentialsUserConfiguration(null, uuid, file);
+                    final DatabaseManager.DbUserRecord existingData = databaseManager.loadUser(uuid);
+                    if (existingData == null) {
+                        userConfig.load(); // Automatically loads, saves to DB, and renames the file
+                        migratedCount++;
+                    } else {
+                        final File convertedFile = new File(userdataFolder, fileName + ".converted");
+                        if (!file.renameTo(convertedFile)) {
+                            getLogger().warning("[Database] Failed to rename converted user file: " + fileName);
+                        }
+                    }
+                } catch (Exception e) {
+                    getLogger().log(Level.SEVERE, "[Database] Failed to migrate user file: " + fileName, e);
+                    failedCount++;
+                }
+            }
+
+            getLogger().info("[Database] Bulk migration finished. Migrated: " + migratedCount + ", Failed: " + failedCount + ".");
+        });
     }
 
     // Returns our provider logger if available
@@ -587,6 +651,9 @@ public class Essentials extends JavaPlugin implements net.ess3.api.IEssentials {
         Economy.setEss(null);
         Trade.closeLog();
         getUsers().shutdown();
+        if (databaseManager != null) {
+            databaseManager.shutdown();
+        }
 
         EssentialsConfiguration.shutdownExecutor();
 

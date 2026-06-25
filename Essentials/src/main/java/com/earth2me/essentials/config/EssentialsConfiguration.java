@@ -122,6 +122,10 @@ public class EssentialsConfiguration {
         setInternal(path, LazyLocation.fromLocation(location));
     }
 
+    public void setProperty(final String path, final LazyLocation location) {
+        setInternal(path, location);
+    }
+
     public LazyLocation getLocation(final String path) {
         final CommentedConfigurationNode node = path == null ? getRootNode() : getSection(path);
         if (node == null) {
@@ -420,6 +424,35 @@ public class EssentialsConfiguration {
 
     public void convertAltFile() {
 
+    }
+
+    public void loadFromString(final String yamlString) throws ConfigurateException {
+        if (yamlString == null || yamlString.trim().isEmpty()) {
+            configurationNode = loader.createNode();
+            return;
+        }
+        final YamlConfigurationLoader stringLoader = YamlConfigurationLoader.builder()
+                .defaultOptions(opts -> opts.serializers(SERIALIZERS))
+                .nodeStyle(NodeStyle.BLOCK)
+                .indent(2)
+                .source(() -> new java.io.BufferedReader(new java.io.StringReader(yamlString)))
+                .build();
+        configurationNode = stringLoader.load();
+    }
+
+    public String saveToString() throws ConfigurateException {
+        if (configurationNode == null) {
+            return "";
+        }
+        final java.io.StringWriter writer = new java.io.StringWriter();
+        final YamlConfigurationLoader stringLoader = YamlConfigurationLoader.builder()
+                .defaultOptions(opts -> opts.serializers(SERIALIZERS))
+                .nodeStyle(NodeStyle.BLOCK)
+                .indent(2)
+                .sink(() -> new java.io.BufferedWriter(writer))
+                .build();
+        stringLoader.save(configurationNode);
+        return writer.toString();
     }
 
     /**

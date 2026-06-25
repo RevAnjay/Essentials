@@ -13,6 +13,7 @@ dependencies {
     implementation 'org.spongepowered:configurate-yaml:4.2.0'
     implementation 'org.checkerframework:checker-qual:3.49.0'
     implementation 'nu.studer:java-ordered-properties:1.0.4'
+    implementation 'com.zaxxer:HikariCP:4.0.3'
 
     implementation 'net.kyori:adventure-api:4.25.0'
     implementation 'net.kyori:adventure-text-minimessage:4.25.0'
@@ -58,6 +59,7 @@ shadowJar {
         include (dependency('io.leangen.geantyref:geantyref'))
         include (dependency('org.checkerframework:checker-qual'))
         include (dependency('nu.studer:java-ordered-properties'))
+        include (dependency('com.zaxxer:HikariCP'))
         include (dependency('net.kyori:adventure-api'))
         include (dependency('net.kyori:adventure-key'))
         include (dependency('net.kyori:examination-api'))
@@ -98,6 +100,7 @@ shadowJar {
     relocate 'org.yaml.snakeyaml', 'com.earth2me.essentials.libs.snakeyaml'
     relocate 'io.leangen.geantyref', 'com.earth2me.essentials.libs.geantyref'
     relocate 'org.checkerframework', 'com.earth2me.essentials.libs.checkerframework'
+    relocate 'com.zaxxer.hikari', 'com.earth2me.essentials.libs.hikari'
     relocate 'net.kyori', 'com.earth2me.essentials.libs.kyori'
     relocate 'net.essentialsx.temp.adventure', 'net.kyori.adventure' // Undo temporary relocation for Paper Provider
 

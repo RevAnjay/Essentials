@@ -240,6 +240,10 @@ public class AsyncTeleport implements IAsyncTeleport {
     }
 
     private void teleport(final IUser teleportee, final ITarget target, final Trade chargeFor, final TeleportCause cause, final CompletableFuture<Boolean> future) {
+        if (teleportee.getAsyncTeleport().isTeleportPending()) {
+            future.completeExceptionally(new TranslatableException("alreadyTeleporting"));
+            return;
+        }
         double delay = ess.getSettings().getTeleportDelay();
 
         final TeleportWarmupEvent event = new TeleportWarmupEvent(teleportee, cause, target, delay);
@@ -291,6 +295,10 @@ public class AsyncTeleport implements IAsyncTeleport {
     }
 
     private void teleportOther(final IUser teleporter, final IUser teleportee, final ITarget target, final Trade chargeFor, final CompletableFuture<Boolean> future) {
+        if (teleportee.getAsyncTeleport().isTeleportPending()) {
+            future.completeExceptionally(new TranslatableException("alreadyTeleporting"));
+            return;
+        }
         double delay = ess.getSettings().getTeleportDelay();
 
         final TeleportWarmupEvent event = new TeleportWarmupEvent(teleporter, teleportee, TeleportCause.COMMAND, target, delay);
@@ -344,6 +352,10 @@ public class AsyncTeleport implements IAsyncTeleport {
 
     @Override
     public void respawn(final Trade chargeFor, final TeleportCause cause, final CompletableFuture<Boolean> future) {
+        if (isTeleportPending()) {
+            future.completeExceptionally(new TranslatableException("alreadyTeleporting"));
+            return;
+        }
         double delay = ess.getSettings().getTeleportDelay();
 
         final TeleportWarmupEvent event = new TeleportWarmupEvent(teleportOwner, cause, null, delay);
@@ -462,6 +474,11 @@ public class AsyncTeleport implements IAsyncTeleport {
 
     private void initTimer(final long delay, final IUser teleportUser, final ITarget target, final Trade chargeFor, final TeleportCause cause, final boolean respawn, CompletableFuture<Boolean> future) {
         timedTeleport = new AsyncTimedTeleport(teleportOwner, ess, this, delay, future, teleportUser, target, chargeFor, cause, respawn);
+    }
+
+    @Override
+    public boolean isTeleportPending() {
+        return timedTeleport != null && timedTeleport.isRunning();
     }
 
     public enum TeleportType {

@@ -132,4 +132,10 @@ public interface IAsyncTeleport {
      */
     void back(CompletableFuture<Boolean> future);
 
+    /**
+     * Checks if a teleport is currently pending (warmup is running).
+     *
+     * @return true if a teleport is pending, false otherwise
+     */
+    boolean isTeleportPending();
 }

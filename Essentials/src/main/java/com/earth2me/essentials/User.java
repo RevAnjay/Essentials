@@ -1108,13 +1108,32 @@ public class User extends UserData implements Comparable<User>, IMessageRecipien
     @Override
     public void sendMessage(final String message) {
         if (!message.isEmpty()) {
-            base.sendMessage(message);
+            sendComponent(ess.getAdventureFacet().legacyToAdventure(message));
         }
     }
 
     @Override
     public void sendComponent(ComponentHolder component) {
-        ess.getAdventureFacet().send(base, component);
+        final String delivery = ess.getSettings().getMessageDeliveryType(null);
+        if (delivery.equalsIgnoreCase("actionbar")) {
+            if (base != null) {
+                ess.getAdventureFacet().sendActionBar(base, component);
+            }
+        } else if (delivery.equalsIgnoreCase("title")) {
+            if (base != null) {
+                final String legacyMsg = ess.getAdventureFacet().adventureToLegacy(component);
+                base.sendTitle(legacyMsg, "", 10, 40, 10);
+            }
+        } else if (delivery.equalsIgnoreCase("both") || delivery.equalsIgnoreCase("message_actionbar") || delivery.equalsIgnoreCase("message+actionbar")) {
+            if (base != null) {
+                ess.getAdventureFacet().sendActionBar(base, component);
+                ess.getAdventureFacet().send(base, component);
+            } else {
+                ess.getAdventureFacet().send(base, component);
+            }
+        } else {
+            ess.getAdventureFacet().send(base, component);
+        }
     }
 
     @Override
@@ -1130,7 +1149,30 @@ public class User extends UserData implements Comparable<User>, IMessageRecipien
             return;
         }
 
-        sendComponent(ess.getAdventureFacet().deserializeMiniMessage(translation));
+        if (base != null) {
+            ess.getSettings().playMessageSound(base, tlKey);
+        }
+
+        final String delivery = ess.getSettings().getMessageDeliveryType(tlKey);
+        if (delivery.equalsIgnoreCase("actionbar")) {
+            if (base != null) {
+                ess.getAdventureFacet().sendActionBar(base, ess.getAdventureFacet().deserializeMiniMessage(translation));
+            }
+        } else if (delivery.equalsIgnoreCase("title")) {
+            if (base != null) {
+                final String legacyMsg = ess.getAdventureFacet().miniToLegacy(translation);
+                base.sendTitle(legacyMsg, "", 10, 40, 10);
+            }
+        } else if (delivery.equalsIgnoreCase("both")) {
+            if (base != null) {
+                ess.getAdventureFacet().sendActionBar(base, ess.getAdventureFacet().deserializeMiniMessage(translation));
+                ess.getAdventureFacet().send(base, ess.getAdventureFacet().deserializeMiniMessage(translation));
+            } else {
+                ess.getAdventureFacet().send(base, ess.getAdventureFacet().deserializeMiniMessage(translation));
+            }
+        } else {
+            ess.getAdventureFacet().send(base, ess.getAdventureFacet().deserializeMiniMessage(translation));
+        }
     }
 
     @Override

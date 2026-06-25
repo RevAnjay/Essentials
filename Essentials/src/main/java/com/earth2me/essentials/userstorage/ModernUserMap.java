@@ -90,6 +90,11 @@ public class ModernUserMap extends CacheLoader<UUID, User> implements IUserMap {
             return null;
         }
 
+        final User user = onlineUserCache.get(uuid);
+        if (user != null) {
+            return user;
+        }
+
         try {
             return userCache.get(uuid);
         } catch (ExecutionException e) {
@@ -102,8 +107,21 @@ public class ModernUserMap extends CacheLoader<UUID, User> implements IUserMap {
 
     @Override
     public User getUser(final Player base) {
-        final User user = loadUncachedUser(base);
+        if (base == null) {
+            return null;
+        }
+
+        User user = onlineUserCache.get(base.getUniqueId());
+        if (user != null) {
+            if (!base.equals(user.getBase())) {
+                user.update(base);
+            }
+            return user;
+        }
+
+        user = loadUncachedUser(base);
         userCache.put(user.getUUID(), user);
+        onlineUserCache.put(user.getUUID(), user);
         debugLogCache(user);
         return user;
     }

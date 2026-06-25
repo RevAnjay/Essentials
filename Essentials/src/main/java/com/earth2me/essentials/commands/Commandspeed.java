@@ -2,7 +2,6 @@ package com.earth2me.essentials.commands;
 
 import com.earth2me.essentials.CommandSource;
 import com.earth2me.essentials.User;
-import com.earth2me.essentials.adventure.AdventureUtil;
 import com.earth2me.essentials.utils.FloatUtil;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
@@ -52,19 +51,29 @@ public class Commandspeed extends EssentialsCommand {
             }
         }
 
+        final boolean isReset = speed == 1f;
         if (isFly) {
             user.getBase().setFlySpeed(getRealMoveSpeed(speed, true, isBypass));
-            user.sendTl("moveSpeed", AdventureUtil.parsed(user.playerTl("flying")), speed, user.getDisplayName());
+            if (isReset) {
+                user.sendTl("speedReset", user.playerTl("flying"));
+            } else {
+                user.sendTl("speedFly", speed);
+            }
             return;
         }
         user.getBase().setWalkSpeed(getRealMoveSpeed(speed, false, isBypass));
-        user.sendTl("moveSpeed", AdventureUtil.parsed(user.playerTl("walking")), speed, user.getDisplayName());
+        if (isReset) {
+            user.sendTl("speedReset", user.playerTl("walking"));
+        } else {
+            user.sendTl("speedWalk", speed);
+        }
     }
 
     private void speedOtherPlayers(final Server server, final CommandSource sender, final boolean isFly, final boolean isBypass, final float speed, final String name) throws PlayerNotFoundException {
         final boolean skipHidden = sender.isPlayer() && !ess.getUser(sender.getPlayer()).canInteractVanished();
         boolean foundUser = false;
         final List<Player> matchedPlayers = server.matchPlayer(name);
+        final boolean isReset = speed == 1f;
         for (final Player matchPlayer : matchedPlayers) {
             final User player = ess.getUser(matchPlayer);
             if (skipHidden && player.isHidden(sender.getPlayer()) && player.isHiddenFrom(sender.getPlayer())) {
@@ -73,10 +82,18 @@ public class Commandspeed extends EssentialsCommand {
             foundUser = true;
             if (isFly) {
                 matchPlayer.setFlySpeed(getRealMoveSpeed(speed, true, isBypass));
-                sender.sendTl("moveSpeed", AdventureUtil.parsed(sender.tl("flying")), speed, matchPlayer.getDisplayName());
+                if (isReset) {
+                    sender.sendTl("speedReset", sender.tl("flying"));
+                } else {
+                    sender.sendTl("speedFly", speed);
+                }
             } else {
                 matchPlayer.setWalkSpeed(getRealMoveSpeed(speed, false, isBypass));
-                sender.sendTl("moveSpeed", AdventureUtil.parsed(sender.tl("walking")), speed, matchPlayer.getDisplayName());
+                if (isReset) {
+                    sender.sendTl("speedReset", sender.tl("walking"));
+                } else {
+                    sender.sendTl("speedWalk", speed);
+                }
             }
         }
         if (!foundUser) {
@@ -100,29 +117,25 @@ public class Commandspeed extends EssentialsCommand {
         return label.contains("walk") || label.equalsIgnoreCase("wspeed") || label.equalsIgnoreCase("ewspeed");
     }
 
-    private boolean isFlyMode(final String modeString) throws NotEnoughArgumentsException {
-        final boolean isFlyMode;
+    private boolean isFlyMode(final String modeString) throws Exception {
         if (modeString.contains("fly") || modeString.equalsIgnoreCase("f")) {
-            isFlyMode = true;
+            return true;
         } else if (modeString.contains("walk") || modeString.contains("run") || modeString.equalsIgnoreCase("w") || modeString.equalsIgnoreCase("r")) {
-            isFlyMode = false;
+            return false;
         } else {
-            throw new NotEnoughArgumentsException();
+            throw new net.ess3.api.TranslatableException("speedInvalidType");
         }
-        return isFlyMode;
     }
 
-    private float getMoveSpeed(final String moveSpeed) throws NotEnoughArgumentsException {
-        float userSpeed;
+    private float getMoveSpeed(final String moveSpeed) throws Exception {
+        final float userSpeed;
         try {
             userSpeed = FloatUtil.parseFloat(moveSpeed);
-            if (userSpeed > 10f) {
-                userSpeed = 10f;
-            } else if (userSpeed < 0.0001f) {
-                userSpeed = 0.0001f;
+            if (userSpeed > 10f || userSpeed < 0.0001f) {
+                throw new net.ess3.api.TranslatableException("speedInvalidRange", 10);
             }
         } catch (final NumberFormatException e) {
-            throw new NotEnoughArgumentsException();
+            throw new net.ess3.api.TranslatableException("speedInvalidRange", 10);
         }
         return userSpeed;
     }

@@ -111,34 +111,177 @@ teleport-cooldown: 0
 # If the player moves or gets attacked in this timeframe, the teleport is cancelled.
 teleport-delay: 0
 
-# Visual and audio feedback during teleport delay.
-teleport-feedback:
-  actionbar:
-    enabled: true
-    # Use {time} for remaining seconds.
-    format: "&eTeleporting in &c{time}s&e. Don't move!"
+# Configuration for messages delivery type (message, actionbar, title, or both) and their sound effects.
+messages:
+  delivery:
+    # Default delivery type for all messages. Options: message, actionbar, title, both (message & actionbar)
+    type: actionbar
+    overrides:
+      # per-message delivery overrides
+      # dontMoveMessage: actionbar
+      # pendingTeleportCancelled: actionbar
+      teleportHereRequest: message
+      tpaRequestCancelledTarget: message
+      teleportRequest: message
+      teleportToPlayer: message
+      teleportAtoB: message
+      teleporting: message
+      nearbyPlayers: message
+      nearNone: message
+      radiusTooBig: message
+      flyEnabled: message
+      flyDisabled: message
+      flyEnabledOthers: message
+      flyDisabledOthers: message
+      speedInvalidType: message
+      speedInvalidRange: message
+      speedWalk: message
+      speedFly: message
+      speedReset: message
+      seenOnline: message
+      seenOffline: message
+      playerNeverOnServer: message
+      seenLoadFailed: message
+      invalidWorld: message
+      teleportInvalidLocation: message
+      teleportFailed: message
+
   sounds:
+    # enable or disable all sounds
     enabled: true
-    # Sound played each second during warmup
-    warmup:
-      sound: "block.note_block.pling"
-      volume: 1.0
-      pitch: 0.8
-    # Sound played when teleportation is successful
-    success:
-      sound: "entity.enderman.teleport"
-      volume: 1.0
+    default:
+      # default sound name (use "none" to disable)
+      name: UI_BUTTON_CLICK
+      # default sound volume
+      volume: 0.8
+      # default sound pitch
       pitch: 1.0
-    # Sound played when teleportation is cancelled (e.g. player moved or was damaged)
-    cancel:
-      sound: "block.anvil.land"
-      volume: 1.0
-      pitch: 1.0
-    # Sound played when a teleport request is accepted (/tpaccept)
-    accept:
-      sound: "entity.experience_orb.pickup"
-      volume: 1.0
-      pitch: 1.2
+    overrides:
+      # sound overrides by message key
+      loading:
+        name: UI_BUTTON_CLICK
+        volume: 0.6
+        pitch: 1.2
+      databaseError:
+        name: BLOCK_NOTE_BLOCK_BASS
+        volume: 0.8
+        pitch: 0.6
+      noPerm:
+        name: BLOCK_NOTE_BLOCK_BASS
+        volume: 0.8
+        pitch: 0.6
+      homeSet:
+        name: BLOCK_NOTE_BLOCK_PLING
+        volume: 0.9
+        pitch: 1.6
+      homeSetFailed:
+        name: BLOCK_NOTE_BLOCK_BASS
+        volume: 0.8
+        pitch: 0.6
+      homeSetDelay:
+        name: BLOCK_NOTE_BLOCK_HAT
+        volume: 0.6
+        pitch: 0.8
+      deleteHome:
+        name: BLOCK_NOTE_BLOCK_PLING
+        volume: 0.8
+        pitch: 1.2
+      homeDeleteFailed:
+        name: BLOCK_NOTE_BLOCK_BASS
+        volume: 0.8
+        pitch: 0.6
+      homeDeleteConfirm:
+        name: BLOCK_NOTE_BLOCK_HAT
+        volume: 0.6
+        pitch: 1.4
+      teleportHome:
+        name: ENTITY_ENDERMAN_TELEPORT
+        volume: 0.7
+        pitch: 1.0
+      teleportationCommencing:
+        name: ENTITY_ENDERMAN_TELEPORT
+        volume: 0.7
+        pitch: 1.0
+      dontMoveMessage:
+        name: BLOCK_NOTE_BLOCK_CHIME
+        volume: 0.6
+        pitch: 1.2
+      pendingTeleportCancelled:
+        name: BLOCK_NOTE_BLOCK_BASS
+        volume: 0.8
+        pitch: 0.6
+      invalidWorld:
+        name: BLOCK_NOTE_BLOCK_BASS
+        volume: 0.8
+        pitch: 0.6
+      essentialsReload:
+        name: BLOCK_NOTE_BLOCK_PLING
+        volume: 0.8
+        pitch: 1.3
+      commandDisabled:
+        name: BLOCK_NOTE_BLOCK_BASS
+        volume: 0.8
+        pitch: 0.6
+      spawnSet:
+        name: BLOCK_NOTE_BLOCK_PLING
+        volume: 0.8
+        pitch: 1.2
+      spawnTeleported:
+        name: ENTITY_ENDERMAN_TELEPORT
+        volume: 0.7
+        pitch: 1.0
+      spawnTeleportWarmup:
+        name: BLOCK_NOTE_BLOCK_CHIME
+        volume: 0.6
+        pitch: 1.2
+      spawnTeleportCancelled:
+        name: BLOCK_NOTE_BLOCK_BASS
+        volume: 0.8
+        pitch: 0.6
+      backUsageMsg:
+        name: ENTITY_ENDERMAN_TELEPORT
+        volume: 0.7
+        pitch: 1.0
+      backTeleportWarmup:
+        name: BLOCK_NOTE_BLOCK_CHIME
+        volume: 0.6
+        pitch: 1.2
+      backTeleportCancelled:
+        name: BLOCK_NOTE_BLOCK_BASS
+        volume: 0.8
+        pitch: 0.6
+      noLocationFound:
+        name: BLOCK_NOTE_BLOCK_BASS
+        volume: 0.8
+        pitch: 0.6
+      spawnNotSet:
+        name: BLOCK_NOTE_BLOCK_BASS
+        volume: 0.8
+        pitch: 0.6
+      warpSet:
+        name: BLOCK_NOTE_BLOCK_PLING
+        volume: 0.8
+        pitch: 1.2
+      warpUpdated:
+        name: BLOCK_NOTE_BLOCK_PLING
+        volume: 0.8
+        pitch: 1.1
+      deleteWarp:
+        name: BLOCK_NOTE_BLOCK_PLING
+        volume: 0.8
+        pitch: 1.2
+      warpingTo:
+        name: ENTITY_ENDERMAN_TELEPORT
+        volume: 0.7
+        pitch: 1.0
+      warpTeleportWarmup:
+        name: BLOCK_NOTE_BLOCK_CHIME
+        volume: 0.6
+        pitch: 1.2
+      warpTeleportCancelled:
+        name: BLOCK_NOTE_BLOCK_BASS
+        volume: 0.8
+        pitch: 0.6
 
 
 # The delay, in seconds, during which a player can't be attacked by other players after being teleported by a command.
@@ -774,6 +917,31 @@ allow-world-in-broadcastworld: true
 # Should the usermap try to sanitize usernames before saving them?
 # You should only change this to false if you use Minecraft China.
 safe-usermap-names: true
+
+# The database type used for user storage.
+# Options:
+#  - yml (Default - flat files in userdata/ directory)
+#  - sqlite (Experimental - SQL relational database, may contain bugs)
+#  - mysql (Experimental - MySQL/MariaDB database)
+database:
+  type: yml
+  sqlite:
+    file: essentials.db
+    busy-timeout-ms: 5000
+  mysql:
+    host: localhost
+    port: 3306
+    database: essentials
+    username: root
+    password: ""
+    use-ssl: false
+  pool:
+    maximum-pool-size: 10
+    minimum-idle: 2
+    connection-timeout-seconds: 10
+    idle-timeout-seconds: 600
+    max-lifetime-minutes: 30
+
 
 # Should Essentials output logs when a command block executes a command?
 # Example: CommandBlock at <x>,<y>,<z> issued server command: /<command>

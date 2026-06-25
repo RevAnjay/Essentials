@@ -110,7 +110,7 @@ public class Commandnear extends EssentialsCommand {
             output.append(user.playerTl("nearbyPlayersList", nearbyPlayer.getDisplayName(), (long)nearbyPlayer.getLocation().distance(loc)));
         }
 
-        return output.length() > 1 ? output.toString() : source.tl("none");
+        return output.length() > 1 ? output.toString() : source.tl("nearNone", radius);
     }
 
     @Override

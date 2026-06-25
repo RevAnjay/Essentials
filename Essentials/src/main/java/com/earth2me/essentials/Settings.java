@@ -22,14 +22,17 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.command.Command;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.spongepowered.configurate.CommentedConfigurationNode;
 
 import java.io.File;
+import java.util.Locale;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -43,7 +46,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -158,21 +160,36 @@ public class Settings implements net.ess3.api.ISettings {
     private Set<String> multiplierPerms;
     private BigDecimal defaultMultiplier;
     private List<String> afkTimeoutCommands = Collections.emptyList();
-    private boolean teleportFeedbackActionBarEnabled;
-    private String teleportFeedbackActionBarFormat;
-    private boolean teleportFeedbackSoundsEnabled;
-    private String teleportFeedbackSoundWarmup;
-    private float teleportFeedbackSoundWarmupVolume;
-    private float teleportFeedbackSoundWarmupPitch;
-    private String teleportFeedbackSoundSuccess;
-    private float teleportFeedbackSoundSuccessVolume;
-    private float teleportFeedbackSoundSuccessPitch;
-    private String teleportFeedbackSoundCancel;
-    private float teleportFeedbackSoundCancelVolume;
-    private float teleportFeedbackSoundCancelPitch;
-    private String teleportFeedbackSoundAccept;
-    private float teleportFeedbackSoundAcceptVolume;
-    private float teleportFeedbackSoundAcceptPitch;
+
+    public static class SoundSetting {
+        private final String name;
+        private final float volume;
+        private final float pitch;
+
+        public SoundSetting(final String name, final float volume, final float pitch) {
+            this.name = name;
+            this.volume = volume;
+            this.pitch = pitch;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public float getVolume() {
+            return volume;
+        }
+
+        public float getPitch() {
+            return pitch;
+        }
+    }
+
+    private String messageDeliveryType;
+    private final Map<String, String> messageDeliveryOverrides = new HashMap<>();
+    private boolean messageSoundsEnabled;
+    private SoundSetting messageSoundDefault;
+    private final Map<String, SoundSetting> messageSoundOverrides = new HashMap<>();
 
     public Settings(final IEssentials ess) {
         this.ess = ess;
@@ -329,79 +346,54 @@ public class Settings implements net.ess3.api.ISettings {
         return config.getDouble("teleport-delay", 0);
     }
 
-    @Override
-    public boolean isTeleportFeedbackActionBarEnabled() {
-        return teleportFeedbackActionBarEnabled;
+    private SoundSetting getSoundSetting(final String tlKey) {
+        SoundSetting sound = messageSoundOverrides.get(tlKey);
+        if (sound == null) {
+            sound = messageSoundDefault;
+        }
+        return sound;
     }
 
     @Override
-    public String getTeleportFeedbackActionBarFormat() {
-        return teleportFeedbackActionBarFormat;
+    public String getMessageDeliveryType(final String tlKey) {
+        if (tlKey != null) {
+            final String override = messageDeliveryOverrides.get(tlKey);
+            if (override != null) {
+                return override;
+            }
+        }
+        return messageDeliveryType != null ? messageDeliveryType : "message";
     }
 
     @Override
-    public boolean isTeleportFeedbackSoundsEnabled() {
-        return teleportFeedbackSoundsEnabled;
+    public boolean isMessageSoundsEnabled() {
+        return messageSoundsEnabled;
     }
 
     @Override
-    public String getTeleportFeedbackSoundWarmup() {
-        return teleportFeedbackSoundWarmup;
-    }
+    public void playMessageSound(final Player player, final String tlKey) {
+        if (!messageSoundsEnabled || player == null || tlKey == null) {
+            return;
+        }
+        final SoundSetting sound = getSoundSetting(tlKey);
+        if (sound != null && sound.getName() != null && !sound.getName().isEmpty()) {
+            try {
+                Sound bukkitSound = null;
+                try {
+                    bukkitSound = Sound.valueOf(sound.getName().toUpperCase(Locale.ROOT));
+                } catch (final IllegalArgumentException e) {
+                    // Not a standard Bukkit sound enum name
+                }
 
-    @Override
-    public float getTeleportFeedbackSoundWarmupVolume() {
-        return teleportFeedbackSoundWarmupVolume;
-    }
-
-    @Override
-    public float getTeleportFeedbackSoundWarmupPitch() {
-        return teleportFeedbackSoundWarmupPitch;
-    }
-
-    @Override
-    public String getTeleportFeedbackSoundSuccess() {
-        return teleportFeedbackSoundSuccess;
-    }
-
-    @Override
-    public float getTeleportFeedbackSoundSuccessVolume() {
-        return teleportFeedbackSoundSuccessVolume;
-    }
-
-    @Override
-    public float getTeleportFeedbackSoundSuccessPitch() {
-        return teleportFeedbackSoundSuccessPitch;
-    }
-
-    @Override
-    public String getTeleportFeedbackSoundCancel() {
-        return teleportFeedbackSoundCancel;
-    }
-
-    @Override
-    public float getTeleportFeedbackSoundCancelVolume() {
-        return teleportFeedbackSoundCancelVolume;
-    }
-
-    @Override
-    public float getTeleportFeedbackSoundCancelPitch() {
-        return teleportFeedbackSoundCancelPitch;
-    }
-
-    @Override
-    public String getTeleportFeedbackSoundAccept() {
-        return teleportFeedbackSoundAccept;
-    }
-
-    @Override
-    public float getTeleportFeedbackSoundAcceptVolume() {
-        return teleportFeedbackSoundAcceptVolume;
-    }
-
-    @Override
-    public float getTeleportFeedbackSoundAcceptPitch() {
-        return teleportFeedbackSoundAcceptPitch;
+                if (bukkitSound != null) {
+                    player.playSound(player.getLocation(), bukkitSound, sound.getVolume(), sound.getPitch());
+                } else {
+                    player.playSound(player.getLocation(), sound.getName(), sound.getVolume(), sound.getPitch());
+                }
+            } catch (final Exception e) {
+                // Ignore invalid sounds
+            }
+        }
     }
 
     @Override
@@ -1037,21 +1029,37 @@ public class Settings implements net.ess3.api.ISettings {
         defaultMultiplier = _getDefaultMultiplier();
         afkTimeoutCommands = _getAfkTimeoutCommands();
 
-        teleportFeedbackActionBarEnabled = config.getBoolean("teleport-feedback.actionbar.enabled", true);
-        teleportFeedbackActionBarFormat = config.getString("teleport-feedback.actionbar.format", "&eTeleporting in &c{time}s&e. Don't move!");
-        teleportFeedbackSoundsEnabled = config.getBoolean("teleport-feedback.sounds.enabled", true);
-        teleportFeedbackSoundWarmup = config.getString("teleport-feedback.sounds.warmup.sound", "block.note_block.pling");
-        teleportFeedbackSoundWarmupVolume = (float) config.getDouble("teleport-feedback.sounds.warmup.volume", 1.0);
-        teleportFeedbackSoundWarmupPitch = (float) config.getDouble("teleport-feedback.sounds.warmup.pitch", 0.8);
-        teleportFeedbackSoundSuccess = config.getString("teleport-feedback.sounds.success.sound", "entity.enderman.teleport");
-        teleportFeedbackSoundSuccessVolume = (float) config.getDouble("teleport-feedback.sounds.success.volume", 1.0);
-        teleportFeedbackSoundSuccessPitch = (float) config.getDouble("teleport-feedback.sounds.success.pitch", 1.0);
-        teleportFeedbackSoundCancel = config.getString("teleport-feedback.sounds.cancel.sound", "block.anvil.land");
-        teleportFeedbackSoundCancelVolume = (float) config.getDouble("teleport-feedback.sounds.cancel.volume", 1.0);
-        teleportFeedbackSoundCancelPitch = (float) config.getDouble("teleport-feedback.sounds.cancel.pitch", 1.0);
-        teleportFeedbackSoundAccept = config.getString("teleport-feedback.sounds.accept.sound", "entity.experience_orb.pickup");
-        teleportFeedbackSoundAcceptVolume = (float) config.getDouble("teleport-feedback.sounds.accept.volume", 1.0);
-        teleportFeedbackSoundAcceptPitch = (float) config.getDouble("teleport-feedback.sounds.accept.pitch", 1.2);
+        messageDeliveryType = config.getString("messages.delivery.type", "message");
+        messageDeliveryOverrides.clear();
+        final CommentedConfigurationNode deliveryOverridesNode = config.getSection("messages.delivery.overrides");
+        if (deliveryOverridesNode != null) {
+            for (final Map.Entry<String, CommentedConfigurationNode> entry : ConfigurateUtil.getMap(deliveryOverridesNode).entrySet()) {
+                final String val = entry.getValue().getString();
+                if (val != null) {
+                    messageDeliveryOverrides.put(entry.getKey(), val);
+                }
+            }
+        }
+
+        messageSoundsEnabled = config.getBoolean("messages.sounds.enabled", true);
+        final String defSoundName = config.getString("messages.sounds.default.name", "UI_BUTTON_CLICK");
+        final float defSoundVol = (float) config.getDouble("messages.sounds.default.volume", 0.8);
+        final float defSoundPitch = (float) config.getDouble("messages.sounds.default.pitch", 1.0);
+        messageSoundDefault = new SoundSetting(defSoundName, defSoundVol, defSoundPitch);
+
+        messageSoundOverrides.clear();
+        final CommentedConfigurationNode soundOverridesNode = config.getSection("messages.sounds.overrides");
+        if (soundOverridesNode != null) {
+            for (final Map.Entry<String, CommentedConfigurationNode> entry : ConfigurateUtil.getMap(soundOverridesNode).entrySet()) {
+                final CommentedConfigurationNode childNode = entry.getValue();
+                final String name = childNode.node("name").getString();
+                if (name != null && !name.isEmpty()) {
+                    final float vol = (float) childNode.node("volume").getDouble(0.8);
+                    final float pitch = (float) childNode.node("pitch").getDouble(1.0);
+                    messageSoundOverrides.put(entry.getKey(), new SoundSetting(name, vol, pitch));
+                }
+            }
+        }
 
         reloadCount.incrementAndGet();
     }
@@ -2350,4 +2358,75 @@ public class Settings implements net.ess3.api.ISettings {
     public long getBaltopMinPlaytime() {
         return config.getLong("baltop-requirements.minimum-playtime", 0);
     }
+
+    @Override
+    public String getDatabaseType() {
+        return config.getString("database.type", "yml");
+    }
+
+    @Override
+    public String getDatabaseSqliteFile() {
+        return config.getString("database.sqlite.file", "essentials.db");
+    }
+
+    @Override
+    public int getDatabaseSqliteBusyTimeoutMs() {
+        return config.getInt("database.sqlite.busy-timeout-ms", 5000);
+    }
+
+    @Override
+    public String getDatabaseMysqlHost() {
+        return config.getString("database.mysql.host", "localhost");
+    }
+
+    @Override
+    public int getDatabaseMysqlPort() {
+        return config.getInt("database.mysql.port", 3306);
+    }
+
+    @Override
+    public String getDatabaseMysqlDatabase() {
+        return config.getString("database.mysql.database", "essentials");
+    }
+
+    @Override
+    public String getDatabaseMysqlUsername() {
+        return config.getString("database.mysql.username", "root");
+    }
+
+    @Override
+    public String getDatabaseMysqlPassword() {
+        return config.getString("database.mysql.password", "");
+    }
+
+    @Override
+    public boolean isDatabaseMysqlUseSsl() {
+        return config.getBoolean("database.mysql.use-ssl", false);
+    }
+
+    @Override
+    public int getDatabasePoolMaximumPoolSize() {
+        return config.getInt("database.pool.maximum-pool-size", 10);
+    }
+
+    @Override
+    public int getDatabasePoolMinimumIdle() {
+        return config.getInt("database.pool.minimum-idle", 2);
+    }
+
+    @Override
+    public int getDatabasePoolConnectionTimeoutSeconds() {
+        return config.getInt("database.pool.connection-timeout-seconds", 10);
+    }
+
+    @Override
+    public int getDatabasePoolIdleTimeoutSeconds() {
+        return config.getInt("database.pool.idle-timeout-seconds", 600);
+    }
+
+    @Override
+    public int getDatabasePoolMaxLifetimeMinutes() {
+        return config.getInt("database.pool.max-lifetime-minutes", 30);
+    }
 }
+

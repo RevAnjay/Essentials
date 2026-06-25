@@ -127,18 +127,11 @@ public class AsyncTimedTeleport implements Runnable {
                         teleportUser.sendTl("teleportationCommencing");
 
                         final ISettings settings = ess.getSettings();
-                        if (settings.isTeleportFeedbackSoundsEnabled()) {
-                            final String successSound = settings.getTeleportFeedbackSoundSuccess();
-                            final float successVol = settings.getTeleportFeedbackSoundSuccessVolume();
-                            final float successPitch = settings.getTeleportFeedbackSoundSuccessPitch();
-                            if (successSound != null && !successSound.isEmpty()) {
-                                ess.scheduleEntityDelayedTask(teleportUser.getBase(), () -> {
-                                    if (teleportUser.getBase().isOnline()) {
-                                        teleportUser.getBase().playSound(teleportUser.getBase().getLocation(), successSound, successVol, successPitch);
-                                    }
-                                }, 2L);
+                        ess.scheduleEntityDelayedTask(teleportUser.getBase(), () -> {
+                            if (teleportUser.getBase().isOnline()) {
+                                settings.playMessageSound(teleportUser.getBase(), "teleportationCommencing");
                             }
-                        }
+                        }, 2L);
 
                         if (timer_chargeFor != null) {
                             timer_chargeFor.isAffordableFor(teleportOwner);
@@ -166,18 +159,11 @@ public class AsyncTimedTeleport implements Runnable {
                     final long remainingMillis = (timer_started + timer_delay) - now;
                     final long remainingSecs = Math.max(1, (remainingMillis + 999) / 1000);
                     final ISettings settings = ess.getSettings();
-                    if (settings.isTeleportFeedbackActionBarEnabled()) {
-                        final String format = settings.getTeleportFeedbackActionBarFormat();
+                    if (settings.getMessageDeliveryType("dontMoveMessage").equalsIgnoreCase("actionbar")) {
+                        final String format = I18n.tlLiteral("dontMoveMessage", "{time}");
                         ess.getAdventureFacet().sendActionBar(teleportUser.getBase(), parseFormat(format, String.valueOf(remainingSecs)));
                     }
-                    if (settings.isTeleportFeedbackSoundsEnabled()) {
-                        final String warmupSound = settings.getTeleportFeedbackSoundWarmup();
-                        final float warmupVol = settings.getTeleportFeedbackSoundWarmupVolume();
-                        final float warmupPitch = settings.getTeleportFeedbackSoundWarmupPitch();
-                        if (warmupSound != null && !warmupSound.isEmpty()) {
-                            teleportUser.getBase().playSound(teleportUser.getBase().getLocation(), warmupSound, warmupVol, warmupPitch);
-                        }
-                    }
+                    settings.playMessageSound(teleportUser.getBase(), "dontMoveMessage");
                 }
             }
         }
@@ -205,18 +191,6 @@ public class AsyncTimedTeleport implements Runnable {
                 if (timer_teleportee != null && !timer_teleportee.equals(teleportOwner.getBase().getUniqueId())) {
                     ess.getUser(timer_teleportee).sendTl("pendingTeleportCancelled");
                 }
-                final IUser tUser = ess.getUser(this.timer_teleportee);
-                if (tUser != null && tUser.getBase() != null && tUser.getBase().isOnline()) {
-                    final ISettings settings = ess.getSettings();
-                    if (settings.isTeleportFeedbackSoundsEnabled()) {
-                        final String cancelSound = settings.getTeleportFeedbackSoundCancel();
-                        final float cancelVol = settings.getTeleportFeedbackSoundCancelVolume();
-                        final float cancelPitch = settings.getTeleportFeedbackSoundCancelPitch();
-                        if (cancelSound != null && !cancelSound.isEmpty()) {
-                            tUser.getBase().playSound(tUser.getBase().getLocation(), cancelSound, cancelVol, cancelPitch);
-                        }
-                    }
-                }
             }
         } finally {
             timer_task = null;
@@ -241,5 +215,9 @@ public class AsyncTimedTeleport implements Runnable {
             miniMessageStr = miniMessageStr.replace("%%TAG_" + i + "%%", tags.get(i));
         }
         return ess.getAdventureFacet().deserializeMiniMessage(miniMessageStr);
+    }
+
+    boolean isRunning() {
+        return timer_task != null;
     }
 }

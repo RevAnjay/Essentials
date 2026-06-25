@@ -2,9 +2,11 @@ package com.earth2me.essentials;
 
 import com.earth2me.essentials.adventure.AdventureUtil;
 import net.ess3.api.IEssentials;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -17,13 +19,13 @@ import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
-import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -58,7 +60,7 @@ public class I18n implements net.ess3.api.II18n {
 
     public I18n(final IEssentials ess) {
         this.ess = ess;
-        defaultBundle = ResourceBundle.getBundle(MESSAGES, Locale.ENGLISH, new UTF8PropertiesControl());
+        defaultBundle = ResourceBundle.getBundle(MESSAGES, Locale.ENGLISH, new YamlControl());
         localeBundle = defaultBundle;
     }
 
@@ -140,10 +142,10 @@ public class I18n implements net.ess3.api.II18n {
         if (!loadedBundles.containsKey(locale)) {
             ResourceBundle bundle;
             try {
-                bundle = ResourceBundle.getBundle(MESSAGES, locale, new FileResClassLoader(I18n.class.getClassLoader(), ess), new UTF8PropertiesControl());
+                bundle = ResourceBundle.getBundle(MESSAGES, locale, new FileResClassLoader(I18n.class.getClassLoader(), ess), new YamlControl());
             } catch (MissingResourceException ex) {
                 try {
-                    bundle = ResourceBundle.getBundle(MESSAGES, locale, new UTF8PropertiesControl());
+                    bundle = ResourceBundle.getBundle(MESSAGES, locale, new YamlControl());
                 } catch (MissingResourceException ex2) {
                     bundle = NULL_BUNDLE;
                 }
@@ -218,7 +220,7 @@ public class I18n implements net.ess3.api.II18n {
         ess.getLogger().log(Level.INFO, String.format("Using locale %s", currentLocale.toString()));
 
         try {
-            localeBundle = ResourceBundle.getBundle(MESSAGES, currentLocale, new UTF8PropertiesControl());
+            localeBundle = ResourceBundle.getBundle(MESSAGES, currentLocale, new YamlControl());
         } catch (final MissingResourceException ex) {
             localeBundle = NULL_BUNDLE;
         }
@@ -252,6 +254,17 @@ public class I18n implements net.ess3.api.II18n {
             this.messagesFolder = new File(ess.getDataFolder(), "messages");
             //noinspection ResultOfMethodCallIgnored
             this.messagesFolder.mkdirs();
+
+            final File defaultFile = new File(messagesFolder, "messages_en.yml");
+            if (!defaultFile.exists()) {
+                try (final InputStream in = classLoader.getResourceAsStream("messages_en.yml")) {
+                    if (in != null) {
+                        Files.copy(in, defaultFile.toPath());
+                    }
+                } catch (final IOException e) {
+                    ess.getLogger().log(Level.WARNING, "Could not save default messages_en.yml", e);
+                }
+            }
         }
 
         @Override
@@ -279,13 +292,37 @@ public class I18n implements net.ess3.api.II18n {
         }
     }
 
-    /**
-     * Reads .properties files as UTF-8 instead of ISO-8859-1, which is the default on Java 8/below.
-     * Java 9 fixes this by defaulting to UTF-8 for .properties files.
-     */
-    private static final class UTF8PropertiesControl extends ResourceBundle.Control {
+    private static final class YamlResourceBundle extends ResourceBundle {
+        private final Map<String, String> messages;
+
+        YamlResourceBundle(final Map<String, String> messages) {
+            this.messages = messages;
+        }
+
+        @Override
+        protected Object handleGetObject(final @NotNull String key) {
+            return messages.get(key);
+        }
+
+        @NotNull
+        @Override
+        public Enumeration<String> getKeys() {
+            return Collections.enumeration(messages.keySet());
+        }
+    }
+
+    private static final class YamlControl extends ResourceBundle.Control {
+        @Override
+        public List<String> getFormats(final String baseName) {
+            return Collections.singletonList("yml");
+        }
+
+        @Override
         public ResourceBundle newBundle(final String baseName, final Locale locale, final String format, final ClassLoader loader, final boolean reload) throws IOException {
-            final String resourceName = toResourceName(toBundleName(baseName, locale), "properties");
+            if (!format.equals("yml")) {
+                return null;
+            }
+            final String resourceName = toBundleName(baseName, locale) + ".yml";
             ResourceBundle bundle = null;
             InputStream stream = null;
             if (reload) {
@@ -301,9 +338,15 @@ public class I18n implements net.ess3.api.II18n {
                 stream = loader.getResourceAsStream(resourceName);
             }
             if (stream != null) {
-                try {
-                    // use UTF-8 here, this is the important bit
-                    bundle = new PropertyResourceBundle(new InputStreamReader(stream, StandardCharsets.UTF_8));
+                try (InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
+                    final YamlConfiguration yaml = YamlConfiguration.loadConfiguration(reader);
+                    final Map<String, String> messages = new HashMap<>();
+                    for (final String key : yaml.getKeys(true)) {
+                        if (yaml.isString(key)) {
+                            messages.put(key, yaml.getString(key));
+                        }
+                    }
+                    bundle = new YamlResourceBundle(messages);
                 } finally {
                     stream.close();
                 }
@@ -312,11 +355,11 @@ public class I18n implements net.ess3.api.II18n {
         }
 
         @Override
-        public Locale getFallbackLocale(String baseName, Locale locale) {
-            if (baseName == null || locale == null) {
-                throw new NullPointerException();
+        public Locale getFallbackLocale(final String baseName, final Locale locale) {
+            if (locale.equals(Locale.ENGLISH)) {
+                return null;
             }
-            return null;
+            return Locale.ENGLISH;
         }
     }
 }
