@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import net.ess3.api.TranslatableException;
 
 public class Commandspeed extends EssentialsCommand {
     private static final List<String> types = Arrays.asList("walk", "fly", "1", "1.5", "1.75", "2");
@@ -123,7 +124,7 @@ public class Commandspeed extends EssentialsCommand {
         } else if (modeString.contains("walk") || modeString.contains("run") || modeString.equalsIgnoreCase("w") || modeString.equalsIgnoreCase("r")) {
             return false;
         } else {
-            throw new net.ess3.api.TranslatableException("speedInvalidType");
+            throw new TranslatableException("speedInvalidType");
         }
     }
 
@@ -132,10 +133,10 @@ public class Commandspeed extends EssentialsCommand {
         try {
             userSpeed = FloatUtil.parseFloat(moveSpeed);
             if (userSpeed > 10f || userSpeed < 0.0001f) {
-                throw new net.ess3.api.TranslatableException("speedInvalidRange", 10);
+                throw new TranslatableException("speedInvalidRange", 10);
             }
         } catch (final NumberFormatException e) {
-            throw new net.ess3.api.TranslatableException("speedInvalidRange", 10);
+            throw new TranslatableException("speedInvalidRange", 10);
         }
         return userSpeed;
     }

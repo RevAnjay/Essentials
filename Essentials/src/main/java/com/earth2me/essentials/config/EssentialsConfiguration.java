@@ -47,6 +47,10 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
+import java.io.StringWriter;
+import java.io.BufferedReader;
+import java.io.StringReader;
+import java.io.BufferedWriter;
 
 import static com.earth2me.essentials.I18n.tlLiteral;
 
@@ -435,7 +439,7 @@ public class EssentialsConfiguration {
                 .defaultOptions(opts -> opts.serializers(SERIALIZERS))
                 .nodeStyle(NodeStyle.BLOCK)
                 .indent(2)
-                .source(() -> new java.io.BufferedReader(new java.io.StringReader(yamlString)))
+                .source(() -> new BufferedReader(new StringReader(yamlString)))
                 .build();
         configurationNode = stringLoader.load();
     }
@@ -444,12 +448,12 @@ public class EssentialsConfiguration {
         if (configurationNode == null) {
             return "";
         }
-        final java.io.StringWriter writer = new java.io.StringWriter();
+        final StringWriter writer = new StringWriter();
         final YamlConfigurationLoader stringLoader = YamlConfigurationLoader.builder()
                 .defaultOptions(opts -> opts.serializers(SERIALIZERS))
                 .nodeStyle(NodeStyle.BLOCK)
                 .indent(2)
-                .sink(() -> new java.io.BufferedWriter(writer))
+                .sink(() -> new BufferedWriter(writer))
                 .build();
         stringLoader.save(configurationNode);
         return writer.toString();
