@@ -284,7 +284,9 @@ public abstract class UserData extends PlayerExtension implements IConf {
             return;
         }
         holder.lastLocation(loc);
-        config.save();
+        if (!ess.getSettings().skipPerTeleportSave()) {
+            config.save();
+        }
     }
 
     public Location getLogoutLocation() {
@@ -297,7 +299,9 @@ public abstract class UserData extends PlayerExtension implements IConf {
             return;
         }
         holder.logoutLocation(loc);
-        config.save();
+        if (!ess.getSettings().skipPerTeleportSave()) {
+            config.save();
+        }
     }
 
     public long getLastTeleportTimestamp() {
@@ -306,7 +310,9 @@ public abstract class UserData extends PlayerExtension implements IConf {
 
     public void setLastTeleportTimestamp(final long time) {
         holder.timestamps().lastTeleport(time);
-        config.save();
+        if (!ess.getSettings().skipPerTeleportSave()) {
+            config.save();
+        }
     }
 
     public long getLastHealTimestamp() {

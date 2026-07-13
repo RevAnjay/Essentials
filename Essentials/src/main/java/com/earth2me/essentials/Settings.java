@@ -118,6 +118,7 @@ public class Settings implements net.ess3.api.ISettings {
     private KeepInvPolicy bindingItemPolicy;
     private Set<String> noGodWorlds = new HashSet<>();
     private boolean registerBackInListener;
+    private boolean skipPerTeleportSave;
     private boolean disableItemPickupWhileAfk;
     private long teleportInvulnerabilityTime;
     private boolean teleportInvulnerability;
@@ -888,6 +889,7 @@ public class Settings implements net.ess3.api.ISettings {
         teleportInvulnerability = _isTeleportInvulnerability();
         disableItemPickupWhileAfk = _getDisableItemPickupWhileAfk();
         registerBackInListener = _registerBackInListener();
+        skipPerTeleportSave = _skipPerTeleportSave();
         cancelAfkOnInteract = _cancelAfkOnInteract();
         cancelAfkOnMove = _cancelAfkOnMove();
         getFreezeAfkPlayers = _getFreezeAfkPlayers();
@@ -1538,6 +1540,11 @@ public class Settings implements net.ess3.api.ISettings {
     }
 
     @Override
+    public boolean skipPerTeleportSave() {
+        return skipPerTeleportSave;
+    }
+
+    @Override
     public boolean registerBackInListener() {
         return registerBackInListener;
     }
@@ -1545,6 +1552,10 @@ public class Settings implements net.ess3.api.ISettings {
     @Override
     public int getMaxTreeCommandRange() {
         return config.getInt("tree-command-range-limit", 300);
+    }
+
+    private boolean _skipPerTeleportSave() {
+        return config.getBoolean("skip-per-teleport-save", false);
     }
 
     private boolean _registerBackInListener() {

@@ -256,6 +256,8 @@ public interface ISettings extends IConf {
     int getMaxTreeCommandRange();
 
     boolean registerBackInListener();
+    
+    boolean skipPerTeleportSave();
 
     boolean getDisableItemPickupWhileAfk();
 
