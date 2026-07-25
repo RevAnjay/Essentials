@@ -1,6 +1,7 @@
 package com.earth2me.essentials;
 
 import com.earth2me.essentials.adventure.AdventureFacet;
+import com.earth2me.essentials.commands.HomeGuiHandler;
 import com.earth2me.essentials.api.IItemDb;
 import com.earth2me.essentials.api.IJails;
 import com.earth2me.essentials.api.IWarps;
@@ -178,4 +179,6 @@ public interface IEssentials extends Plugin {
     }
 
     AdventureFacet getAdventureFacet();
+
+    HomeGuiHandler getHomeGuiHandler();
 }

@@ -168,6 +168,10 @@ public class AsyncTeleport implements IAsyncTeleport {
         }
 
         final Location targetLoc = target.getLocation();
+        if (targetLoc == null || targetLoc.getWorld() == null) {
+            future.completeExceptionally(new TranslatableException("errorWithMessage", "Teleport target location is unavailable."));
+            return;
+        }
         if (ess.getSettings().isTeleportSafetyEnabled() && !ess.getSettings().isForceDisableTeleportSafety() && LocationUtil.isBlockOutsideWorldBorder(targetLoc.getWorld(), targetLoc.getBlockX(), targetLoc.getBlockZ())) {
             targetLoc.setX(LocationUtil.getXInsideWorldBorder(targetLoc.getWorld(), targetLoc.getBlockX()));
             targetLoc.setZ(LocationUtil.getZInsideWorldBorder(targetLoc.getWorld(), targetLoc.getBlockZ()));

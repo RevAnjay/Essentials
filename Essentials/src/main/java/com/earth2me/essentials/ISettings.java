@@ -259,6 +259,10 @@ public interface ISettings extends IConf {
     
     boolean skipPerTeleportSave();
 
+    boolean isHomeGuiEnabled();
+
+    boolean isHomeGuiDefault();
+
     boolean getDisableItemPickupWhileAfk();
 
     EventPriority getRespawnPriority();

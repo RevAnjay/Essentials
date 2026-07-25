@@ -26,6 +26,19 @@ public class Commandhome extends EssentialsCommand {
     @Override
     public void run(final Server server, final User user, final String commandLabel, final String[] args) throws Exception {
         final Trade charge = new Trade(this.getName(), ess);
+
+        // Home GUI feature: if enabled, redirect to GUI
+        if (ess.getSettings().isHomeGuiEnabled() && user.isAuthorized("essentials.homegui")) {
+            final boolean defaultGui = ess.getSettings().isHomeGuiDefault();
+            if (defaultGui || user.isHomeGuiEnabled()) {
+                final HomeGuiHandler handler = ess.getHomeGuiHandler();
+                if (handler != null) {
+                    handler.openHomeGui(user);
+                    throw new NoChargeException();
+                }
+            }
+        }
+
         User player = user;
         String homeName = "";
         final String[] nameParts;

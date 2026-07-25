@@ -119,6 +119,8 @@ public class Settings implements net.ess3.api.ISettings {
     private Set<String> noGodWorlds = new HashSet<>();
     private boolean registerBackInListener;
     private boolean skipPerTeleportSave;
+    private boolean homeGuiEnabled;
+    private boolean homeGuiDefault;
     private boolean disableItemPickupWhileAfk;
     private long teleportInvulnerabilityTime;
     private boolean teleportInvulnerability;
@@ -890,6 +892,8 @@ public class Settings implements net.ess3.api.ISettings {
         disableItemPickupWhileAfk = _getDisableItemPickupWhileAfk();
         registerBackInListener = _registerBackInListener();
         skipPerTeleportSave = _skipPerTeleportSave();
+        homeGuiEnabled = _isHomeGuiEnabled();
+        homeGuiDefault = _isHomeGuiDefault();
         cancelAfkOnInteract = _cancelAfkOnInteract();
         cancelAfkOnMove = _cancelAfkOnMove();
         getFreezeAfkPlayers = _getFreezeAfkPlayers();
@@ -1545,6 +1549,16 @@ public class Settings implements net.ess3.api.ISettings {
     }
 
     @Override
+    public boolean isHomeGuiEnabled() {
+        return homeGuiEnabled;
+    }
+
+    @Override
+    public boolean isHomeGuiDefault() {
+        return homeGuiDefault;
+    }
+
+    @Override
     public boolean registerBackInListener() {
         return registerBackInListener;
     }
@@ -1556,6 +1570,14 @@ public class Settings implements net.ess3.api.ISettings {
 
     private boolean _skipPerTeleportSave() {
         return config.getBoolean("skip-per-teleport-save", false);
+    }
+
+    private boolean _isHomeGuiEnabled() {
+        return config.getBoolean("home-gui.enabled", false);
+    }
+
+    private boolean _isHomeGuiDefault() {
+        return config.getBoolean("home-gui.is-default", true);
     }
 
     private boolean _registerBackInListener() {

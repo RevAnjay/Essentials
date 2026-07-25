@@ -972,6 +972,13 @@ update-check: true
 # +------------------------------------------------------+ #
 ############################################################
 
+# Home GUI - Replaces /home command with a Paper Dialog (Java) or Floodgate Form (Bedrock) GUI.
+# When enabled, /home and /home <name> will open the GUI instead of teleporting directly.
+# Requires Paper 1.21.7+ for the Dialog API.
+home-gui:
+  enabled: false
+  is-default: true
+
 # Allows people to set their bed during the day.
 # This setting has no effect in Minecraft 1.15+, as Minecraft will always allow the player to set their bed location during the day.
 update-bed-at-daytime: true

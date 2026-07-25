@@ -61,38 +61,14 @@ shadowJar {
         include (dependency('nu.studer:java-ordered-properties'))
         include (dependency('com.zaxxer:HikariCP'))
         include (dependency('net.kyori:adventure-api'))
-        include (dependency('net.kyori:adventure-key'))
-        include (dependency('net.kyori:examination-api'))
-        include (dependency('net.kyori:examination-string'))
-        include (dependency('net.kyori:option'))
-        include (dependency('net.kyori:adventure-platform-bukkit'))
-        include (dependency('net.kyori:adventure-platform-api'))
-        include (dependency('net.kyori:adventure-platform-facet'))
-        include (dependency('net.kyori:adventure-nbt'))
-        include (dependency('net.kyori:adventure-text-serializer-bungeecord'))
-        include (dependency('net.kyori:adventure-text-serializer-gson'))
-        include (dependency('net.kyori:adventure-text-serializer-gson-legacy-impl'))
-        include (dependency('net.kyori:adventure-text-serializer-json'))
-        include (dependency('net.kyori:adventure-text-serializer-json-legacy-impl'))
-        include (dependency('net.kyori:adventure-text-serializer-legacy'))
         include (dependency('net.kyori:adventure-text-minimessage'))
+        include (dependency('net.kyori:adventure-platform-bukkit'))
         include (project(':providers:BaseProviders'))
         include (project(path: ':providers:PaperProvider', configuration: 'shadow'))
         include (project(':providers:FoliaProvider'))
         include (project(':providers:NMSReflectionProvider'))
         include (project(':providers:1_8Provider'))
         include (project(':providers:1_12Provider'))
-
-        // Paper in-dev adventure versions (for snapshot/pre-releases)
-        include (dependency('io.papermc.adventure:adventure-api'))
-        include (dependency('io.papermc.adventure:adventure-key'))
-        include (dependency('io.papermc.adventure:adventure-nbt'))
-        include (dependency('io.papermc.adventure:adventure-text-serializer-gson'))
-        include (dependency('io.papermc.adventure:adventure-text-serializer-gson-legacy-impl'))
-        include (dependency('io.papermc.adventure:adventure-text-serializer-json'))
-        include (dependency('io.papermc.adventure:adventure-text-serializer-json-legacy-impl'))
-        include (dependency('io.papermc.adventure:adventure-text-serializer-legacy'))
-        include (dependency('io.papermc.adventure:adventure-text-minimessage'))
     }
     relocate 'io.papermc.lib', 'com.earth2me.essentials.paperlib'
     relocate 'org.bstats', 'com.earth2me.essentials.libs.bstats'
@@ -101,13 +77,9 @@ shadowJar {
     relocate 'io.leangen.geantyref', 'com.earth2me.essentials.libs.geantyref'
     relocate 'org.checkerframework', 'com.earth2me.essentials.libs.checkerframework'
     relocate 'com.zaxxer.hikari', 'com.earth2me.essentials.libs.hikari'
-    relocate 'net.kyori', 'com.earth2me.essentials.libs.kyori'
     relocate 'net.essentialsx.temp.adventure', 'net.kyori.adventure' // Undo temporary relocation for Paper Provider
 
     minimize {
         include(dependency('org.checkerframework:checker-qual'))
-        include(dependency('net.kyori:adventure-api'))
-        include(dependency('net.kyori:adventure-platform-bukkit'))
-        include(dependency('net.kyori:adventure-text-minimessage'))
     }
 }

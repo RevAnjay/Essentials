@@ -44,6 +44,7 @@ import com.earth2me.essentials.perm.PermissionsHandler;
 import com.earth2me.essentials.signs.SignBlockListener;
 import com.earth2me.essentials.signs.SignEntityListener;
 import com.earth2me.essentials.signs.SignPlayerListener;
+import com.earth2me.essentials.commands.HomeGuiHandler;
 import com.earth2me.essentials.textreader.IText;
 import com.earth2me.essentials.textreader.KeywordReplacer;
 import com.earth2me.essentials.textreader.SimpleTextInput;
@@ -193,6 +194,7 @@ public class Essentials extends JavaPlugin implements net.ess3.api.IEssentials {
     private transient RandomTeleport randomTeleport;
     private transient UpdateChecker updateChecker;
     private transient AdventureFacet adventureFacet;
+    private transient HomeGuiHandler homeGuiHandler;
 
     static {
         EconomyLayers.init();
@@ -592,6 +594,14 @@ public class Essentials extends JavaPlugin implements net.ess3.api.IEssentials {
 
         if (recipeBookEventProvider != null) {
             pm.registerEvents(recipeBookEventProvider, this);
+        }
+
+        if (getSettings().isHomeGuiEnabled()) {
+            final HomeGuiHandler homeGuiHandler = new HomeGuiHandler(this);
+            pm.registerEvents(homeGuiHandler, this);
+            this.homeGuiHandler = homeGuiHandler;
+        } else {
+            this.homeGuiHandler = null;
         }
 
         jails.resetListener();
@@ -1521,6 +1531,11 @@ public class Essentials extends JavaPlugin implements net.ess3.api.IEssentials {
     @Override
     public AdventureFacet getAdventureFacet() {
         return adventureFacet;
+    }
+
+    @Override
+    public HomeGuiHandler getHomeGuiHandler() {
+        return homeGuiHandler;
     }
 
     private AbstractItemDb getItemDbFromConfig() {

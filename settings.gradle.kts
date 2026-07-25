@@ -21,6 +21,7 @@ dependencyResolutionManagement {
         maven("https://libraries.minecraft.net/") {
             content { includeGroup("com.mojang") }
         }
+        maven("https://repo.geysermc.net/main/")
     }
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
 }

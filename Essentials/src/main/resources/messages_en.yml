@@ -1,6 +1,5 @@
 # EssentialsX Categorized Language File (English)
 
-
 # Teleportation, Spawn & Warmups
 
 alreadyTeleporting: "<red>You are already teleporting!</red>"
@@ -139,6 +138,9 @@ homes: "<gray>Homes: <color:#00C6F9>{0}</color></gray>"
 homeConfirmation: "<red>You already have a home named <color:#00C6F9>{0}</color>! Type again to overwrite.</red>"
 homeRenamed: "<green>Home <color:#00C6F9>{0}</color> has been renamed to <color:#00C6F9>{1}</color>.</green>"
 homeSet: "<green>Home set to current location.</green>"
+homeGuiDisabled: "<red>The home GUI feature is disabled on this server.</red>"
+homeGuiTurnedOn: "<green>Home GUI enabled. /home will now open the GUI.</green>"
+homeGuiTurnedOff: "<yellow>Home GUI disabled. /home will teleport directly.</yellow>"
 noHomeSetPlayer: "<red>Player has not set a home.</red>"
 delhomeCommandDescription: "Removes a home."
 delhomeCommandUsage: "/<command> [player:]<name>"
@@ -626,13 +628,13 @@ itemloreInvalidItem: "<red>You need to hold an item to edit its lore.</red>"
 itemloreMaxLore: "<red>You cannot add any more lore lines to this item.</red>"
 itemloreNoLine: "<red>Your held item does not have lore text on line <color:#00C6F9>{0}</color>.</red>"
 itemloreNoLore: "<red>Your held item does not have any lore text.</red>"
-itemloreSuccess: "<green>You have added <color:#00C6F9>\"{0}\"</color> to your held item's lore.</green>"
-itemloreSuccessLore: "<green>You have set line <color:#00C6F9>{0}</color> of your held item's lore to <color:#00C6F9>\"{1}\"</color>.</green>"
+itemloreSuccess: '<green>You have added <color:#00C6F9>"{0}"</color> to your held item''s lore.</green>'
+itemloreSuccessLore: '<green>You have set line <color:#00C6F9>{0}</color> of your held item''s lore to <color:#00C6F9>"{1}"</color>.</green>'
 itemMustBeStacked: "<red>Item must be traded in stacks.</red>"
 itemNames: "<gray>Item short names: <color:#00C6F9>{0}</color></gray>"
 itemnameClear: "<gray>You have cleared this item's name.</gray>"
 itemnameInvalidItem: "<red>You need to hold an item to rename it.</red>"
-itemnameSuccess: "<green>You have renamed your held item to <color:#00C6F9>\"{0}\"</color>.</green>"
+itemnameSuccess: '<green>You have renamed your held item to <color:#00C6F9>"{0}"</color>.</green>'
 itemNotEnough1: "<red>You do not have enough of that item to sell.</red>"
 itemNotEnough2: "<red>If you meant to sell all items of that type, use /sell itemname.</red>"
 itemNotEnough3: "<red>/sell itemname -1 will sell all but one item, etc.</red>"
@@ -763,8 +765,6 @@ signFormatTemplate: "<gray>[<color:#00C6F9>{0}</color>]</gray>"
 signProtectInvalidLocation: "<red>You are not allowed to create sign here.</red>"
 
 # General & System Messages
-
-
 
 # Sat Feb 03 17:34:46 GMT 2024
 
@@ -911,7 +911,7 @@ fullStackDefaultOversize: "<gray>Your stack has been set to its maximum size, <c
 gcfree: "<gray>Free memory: <color:#00C6F9>{0}</color> MB.</gray>"
 gcmax: "<gray>Maximum memory: <color:#00C6F9>{0}</color> MB.</gray>"
 gctotal: "<gray>Allocated memory: <color:#00C6F9>{0}</color> MB.</gray>"
-gcWorld: "<gray><color:#00C6F9>{0}</color> \"<color:#00C6F9>{1}</color>\": <color:#00C6F9>{2}</color> chunks, <color:#00C6F9>{3}</color> entities.</gray>"
+gcWorld: '<gray><color:#00C6F9>{0}</color> "<color:#00C6F9>{1}</color>": <color:#00C6F9>{2}</color> chunks, <color:#00C6F9>{3}</color> entities.</gray>'
 geoipJoinFormat: "<gray>Player <color:#00C6F9>{0}</color> comes from <color:#00C6F9>{1}</color>.</gray>"
 geoipCantFind: "<gray>Player <color:#00C6F9>{0}</color> comes from an unknown country.</gray>"
 geoIpErrorOnJoin: "<red>Unable to fetch GeoIP data for <color:#00C6F9>{0}</color>.</red>"
@@ -924,7 +924,7 @@ haveBeenReleased: "<green>You have been released.</green>"
 helpConsole: "<gray>To view help from the console, type ?.</gray>"
 helpFrom: "<gray>Commands from <color:#00C6F9>{0}</color>:</gray>"
 helpLine: "<gray>/<color:#00C6F9>{0}</color>: <color:#00C6F9>{1}</color></gray>"
-helpMatching: "<gray>Commands matching \"<color:#00C6F9>{0}</color>\":</gray>"
+helpMatching: '<gray>Commands matching "<color:#00C6F9>{0}</color>":</gray>'
 helpOp: "<gray>[HelpOp] <color:#00C6F9>{0}</color>: <color:#00C6F9>{1}</color></gray>"
 helpPlugin: "<gray><color:#00C6F9>{0}</color>: Plugin help: /help <color:#00C6F9>{1}</color></gray>"
 holdBook: "<red>You are not holding a writable book.</red>"
@@ -1303,13 +1303,13 @@ discordCommandAccountResponseLinked: "<gray>Your account is linked to the Minecr
 discordCommandAccountResponseLinkedOther: "<color:#00C6F9>{0}</color><gray>'s account is linked to the Minecraft account: </gray><color:#00C6F9>**{1}**</color>"
 discordCommandAccountResponseNotLinked: "<gray>You do not have a linked Minecraft account.</gray>"
 discordCommandAccountResponseNotLinkedOther: "<color:#00C6F9>{0}</color><gray> does not have a linked Minecraft account.</gray>"
-discordCommandLink: "<gray>Join our Discord server at </gray><color:#00C6F9><click:open_url:\"{0}\">{0}</click></color><gray>!</gray>"
+discordCommandLink: '<gray>Join our Discord server at </gray><color:#00C6F9><click:open_url:"{0}">{0}</click></color><gray>!</gray>'
 discordCommandUsage: "/<command>"
 discordCommandUsage1: "/<command>"
 discordCommandUsage1Description: "Sends the Discord invite link to the player"
 discordCommandExecuteDescription: "Executes a console command on the Minecraft server."
 discordCommandExecuteArgumentCommand: "<gray>The command to be executed</gray>"
-discordCommandExecuteReply: "<gray>Executing command: \"</gray><color:#00C6F9>/{0}</color><gray>\"</gray>"
+discordCommandExecuteReply: '<gray>Executing command: "</gray><color:#00C6F9>/{0}</color><gray>"</gray>'
 discordCommandUnlinkDescription: "Unlinks the Minecraft account currently linked to your Discord account"
 discordCommandUnlinkInvalidCode: "<red>You do not currently have a Minecraft account linked to Discord!</red>"
 discordCommandUnlinkUnlinked: "<green>Your Discord account has been unlinked from all associated Minecraft accounts.</green>"
@@ -1343,7 +1343,7 @@ essentialsCommandUsage2Description: "Gives information about the Essentials vers
 essentialsCommandUsage3: "/<command> commands"
 essentialsCommandUsage3Description: "Gives information about what commands Essentials is forwarding"
 essentialsCommandUsage4: "/<command> debug"
-essentialsCommandUsage4Description: "Toggles Essentials' \"debug mode\""
+essentialsCommandUsage4Description: 'Toggles Essentials'' "debug mode"'
 essentialsCommandUsage5: "/<command> reset <player>"
 essentialsCommandUsage5Description: "Resets the given player's userdata"
 essentialsCommandUsage6: "/<command> cleanup"
@@ -1531,7 +1531,7 @@ showkitCommandUsage1Description: "Displays a summary of the items in the specifi
 editsignCommandDescription: "Edits a sign in the world."
 editsignCommandLimit: "<red>Your provided text is too big to fit on the target sign.</red>"
 editsignCommandNoLine: "<red>You must enter a line number between </red><color:#00C6F9>1-4</color><red>.</red>"
-editsignCommandSetSuccess: "<gray>Set line</gray><color:#00C6F9> {0}</color><gray> to \"</gray><color:#00C6F9>{1}</color><gray>\".</gray>"
+editsignCommandSetSuccess: '<gray>Set line</gray><color:#00C6F9> {0}</color><gray> to "</gray><color:#00C6F9>{1}</color><gray>".</gray>'
 editsignCommandTarget: "<red>You must be looking at a sign to edit its text.</red>"
 editsignCommandUsage: "/<command> <set/clear/copy/paste> [line number] [text]"
 editsignCommandUsage1: "/<command> set <line number> <text>"

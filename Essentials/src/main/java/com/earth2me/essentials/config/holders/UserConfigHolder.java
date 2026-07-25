@@ -47,6 +47,16 @@ public class UserConfigHolder {
         this.homes = value;
     }
 
+    private boolean homeGuiEnabled;
+
+    public boolean homeGuiEnabled() {
+        return homeGuiEnabled;
+    }
+
+    public void homeGuiEnabled(final boolean enabled) {
+        this.homeGuiEnabled = enabled;
+    }
+
     private @Nullable String nickname;
 
     public String nickname() {

@@ -199,7 +199,8 @@ public abstract class UserData extends PlayerExtension implements IConf {
     public void renameHome(final String name, final String newName) throws Exception {
         final LazyLocation location = holder.homes().remove(name);
         if (location != null) {
-            holder.homes().put(StringUtil.safeString(newName), location);
+            final String safeNew = StringUtil.safeString(newName);
+            holder.homes().put(safeNew, location);
             config.save();
         } else {
             throw new TranslatableException("invalidHome", name);
@@ -212,6 +213,15 @@ public abstract class UserData extends PlayerExtension implements IConf {
 
     public boolean hasHome(final String name) {
         return holder.homes().containsKey(name);
+    }
+
+    public boolean isHomeGuiEnabled() {
+        return holder.homeGuiEnabled();
+    }
+
+    public void setHomeGuiEnabled(final boolean enabled) {
+        holder.homeGuiEnabled(enabled);
+        config.save();
     }
 
     public String getNickname() {

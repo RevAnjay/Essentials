@@ -17,9 +17,9 @@ val junitPlatformVersion = "1.12.2"
 val mockitoVersion = "5.18.0"
 
 dependencies {
-    testImplementation("org.junit.jupiter:junit-jupiter:${junit5Version}")
-    testImplementation("org.junit.platform:junit-platform-launcher:${junitPlatformVersion}")
-    testImplementation("org.mockito:mockito-core:${mockitoVersion}")
+    testImplementation("org.junit.jupiter:junit-jupiter:$junit5Version")
+    testImplementation("org.junit.platform:junit-platform-launcher:$junitPlatformVersion")
+    testImplementation("org.mockito:mockito-core:$mockitoVersion")
     testImplementation("org.mockbukkit.mockbukkit:mockbukkit-v1.21:4.76.1") {
         exclude(module = "paper-api")
         exclude(module = "spigot-api")
@@ -38,7 +38,10 @@ tasks.test {
         events("PASSED", "SKIPPED", "FAILED")
     }
 
-    val testTmp = rootProject.layout.projectDirectory.dir("test-tmp").asFile
+    val testTmp =
+        rootProject.layout.projectDirectory
+            .dir("test-tmp")
+            .asFile
     doFirst {
         testTmp.mkdirs()
     }
@@ -48,15 +51,15 @@ tasks.test {
 afterEvaluate {
     if (baseExtension.injectBukkitApi.get()) {
         dependencies {
-            api("io.papermc.paper:paper-api:${paperVersion}")
-            testImplementation("io.papermc.paper:paper-api:${paperTestVersion}")
+            api("io.papermc.paper:paper-api:$paperVersion")
+            testImplementation("io.papermc.paper:paper-api:$paperTestVersion")
         }
 
         configurations {
             testCompileClasspath {
                 resolutionStrategy {
                     dependencySubstitution {
-                        substitute( module("io.papermc.paper:paper-api"))
+                        substitute(module("io.papermc.paper:paper-api"))
                             .using(module("io.papermc.paper:paper-api:$paperTestVersion"))
                     }
                 }
@@ -64,7 +67,7 @@ afterEvaluate {
             testRuntimeClasspath {
                 resolutionStrategy {
                     dependencySubstitution {
-                        substitute( module("io.papermc.paper:paper-api"))
+                        substitute(module("io.papermc.paper:paper-api"))
                             .using(module("io.papermc.paper:paper-api:$paperTestVersion"))
                     }
                 }
@@ -93,10 +96,11 @@ tasks {
         filter<ReplaceTokens>(
             "beginToken" to "\${",
             "endToken" to "}",
-            "tokens" to mapOf(
-                "full.version" to fullVersion,
-                "git.branch" to gitBranch
-            )
+            "tokens" to
+                mapOf(
+                    "full.version" to fullVersion,
+                    "git.branch" to gitBranch,
+                ),
         )
     }
     compileJava {
@@ -106,7 +110,7 @@ tasks {
         title = "${project.name} API (v${rootProject.ext["FULL_VERSION"]})"
         val options = options as? StandardJavadocDocletOptions ?: return@javadoc
         options.links(
-            "https://hub.spigotmc.org/javadocs/spigot/"
+            "https://jd.papermc.io/paper/1.21.11/",
         )
         options.addBooleanOption("Xdoclint:none", true)
     }
@@ -124,19 +128,6 @@ tasks {
 // Dependency caching
 configurations.all {
     resolutionStrategy.cacheChangingModulesFor(5, "minutes")
-}
-
-// Select Paper in-dev adventure versions (for snapshot/pre-releases) when available
-configurations.configureEach {
-    resolutionStrategy.capabilitiesResolution.all {
-        if (candidates.size >= 2) {
-            val unstable = candidates.find { c -> c.id.displayName.startsWith("io.papermc") }
-            val stable = candidates.find { c -> c.id.displayName.startsWith("net.kyori") }
-            if (unstable != null && stable != null) {
-                select(unstable)
-            }
-        }
-    }
 }
 
 indra {
@@ -174,7 +165,7 @@ indra {
     }
 
     javaVersions {
-        target(8)
+        target(21)
         minimumToolchain(21)
         // Don't enforce running tests on Java 8; we only care about the release for compiling, not running tests
         strictVersions(false)

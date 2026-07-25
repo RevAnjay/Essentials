@@ -158,3 +158,4 @@ public class SpigotAdventureFacet implements AdventureFacet {
         bukkitAudiences.close();
     }
 }
+
