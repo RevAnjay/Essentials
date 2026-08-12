@@ -242,6 +242,15 @@ public class HomeGuiHandler implements Listener {
             final List<String> loreStrings = getStringList(keyPath + ".lore");
             final List<Component> lore = new ArrayList<>();
             for (final String l : loreStrings) lore.add(parseText(l, slot, homeName));
+            // Minecraft adds italic by default to custom item names; explicitly disable it
+            if (!nameStr.isEmpty()) {
+                meta.displayName(meta.displayName().decoration(net.kyori.adventure.text.format.TextDecoration.ITALIC, false));
+            }
+            final List<Component> fixedLore = new ArrayList<>();
+            for (final Component l : lore) {
+                fixedLore.add(l.decoration(net.kyori.adventure.text.format.TextDecoration.ITALIC, false));
+            }
+            meta.lore(fixedLore);
             meta.lore(lore);
             // hide-tooltip: use Paper 1.20.5+ setHideTooltip if available, else fallback to addItemFlags
             if (guiConfig != null && guiConfig.getBoolean(keyPath + ".hide-tooltip", false)) {
