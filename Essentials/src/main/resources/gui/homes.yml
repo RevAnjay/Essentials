@@ -1,0 +1,184 @@
+# home permissions: essentials.home
+
+# homes feature configuration
+homes:
+  # maximum number of home slots a player can use
+  max-slots: 10
+  delete-confirmation:
+    # require a second left-click on the action button to delete a home
+    enabled: true
+    # confirmation window before the delete expires, in seconds
+    window-seconds: 5
+  # delay after deleting a home before the same slot can be set again, in milliseconds
+  delete-to-set-delay-ms: 500
+  gui:
+    # gui title shown to players
+    title: "Personal Homes - Page %page%"
+    # gui title shown when viewing another player's homes
+    other-title: "%player%'s Homes - Page %page%"
+    # gui size in slots when no page structure is provided
+    size: 27
+    # click types for gui actions on the home icon
+    actions:
+      teleport:
+        - LEFT
+      set:
+        - LEFT
+      delete:
+        - LEFT
+    # show locked slots when the player lacks permission
+    show-locked-slots: true
+    # ingredient definitions used by structure characters
+    ingredients:
+      ".":
+        material: AIR
+        name: ""
+        lore: []
+        # hide the vanilla tooltip for this item
+        hide-tooltip: true
+    navigation:
+      previous:
+        material: ARROW
+        name: "<#7f849c>Previous Page"
+        lore:
+          - "<#d3d3d3>Left-Click to view the previous page."
+        hide-tooltip: false
+      previous-disabled:
+        material: AIR
+        # name: "<#7f849c>Previous Page"
+        # lore:
+        #   - "<#d3d3d3>You are already on the first page."
+        # hide-tooltip: false
+      next:
+        material: ARROW
+        name: "<#7f849c>Next Page"
+        lore:
+          - "<#d3d3d3>Left-Click to view the next page."
+        hide-tooltip: false
+      next-disabled:
+        material: AIR
+        # name: "<#7f849c>Next Page"
+        # lore:
+        #   - "<#d3d3d3>You are already on the last page."
+        # hide-tooltip: false
+    pages:
+      page-1:
+        # gui layout, each string is a row of 9 characters
+        # P = previous page, N = next page, H = home slot, A = action button slot
+        structure:
+          - "........."
+          - "..HHHHH.."
+          - "..AAAAA.."
+          - "P.......N"
+      page-2:
+        structure:
+          - "........."
+          - "..HHHHH.."
+          - "..AAAAA.."
+          - "P.......N"
+        # these items override the global homes.gui.items entries for page 2 only
+        items: []
+#          set:
+#            material: LIME_BED
+#            name: "<#a6e3a1>★ Vacation Home #%slot%"
+#            lore:
+#              - "<#d3d3d3>Second-page home slot."
+#              - "<#d3d3d3>Left-Click to <#a6e3a1>Teleport."
+#            hide-tooltip: false
+#          empty:
+#            material: LIGHT_GRAY_BED
+#            name: "<#7f849c>☆ Empty Vacation Home #%slot%"
+#            lore:
+#              - "<#d3d3d3>Second-page home slot."
+#              - "<#d3d3d3>Use the button below to <#a6e3a1>Set Home."
+#            hide-tooltip: false
+#          locked:
+#            material: RED_BED
+#            name: "<#f38ba8>🔒 Locked Vacation Home #%slot%"
+#            lore:
+#              - "<#d3d3d3>This second-page home slot is locked."
+#            hide-tooltip: false
+#         action-locked:
+#            # action button shown when slot is locked
+#            material: GRAY_DYE
+#            name: "<#7f849c>Home #%slot% Locked"
+#            lore:
+#              - "<#d3d3d3>You cannot use this slot."
+#            hide-tooltip: false
+#          locked-set:
+#            material: RED_BED
+#            name: "<#f38ba8>🔒 Locked Vacation Home #%slot%"
+#            lore:
+#              - "<#d3d3d3>This second-page home slot is locked as"
+#              - "<#d3d3d3>you lost the required permission."
+#            hide-tooltip: false
+    items:
+      set:
+        # item shown when a home is set
+        material: LIME_BED
+        name: "<#a6e3a1>★ Home #%slot%"
+        lore:
+          - "<#d3d3d3>Left-Click to <#a6e3a1>Teleport."
+        # hide the vanilla tooltip for this item
+        hide-tooltip: false
+      delete-confirm:
+        # item shown after the first delete click
+        material: RED_DYE
+        name: "<#f38ba8>Click Again to Delete"
+        lore:
+          - "<#d3d3d3>Confirm deletion for Home #%slot%."
+        # hide the vanilla tooltip for this item
+        hide-tooltip: false
+      empty:
+        # item shown when the slot is empty
+        material: LIGHT_GRAY_BED
+        name: "<#7f849c>☆ Empty Home #%slot%"
+        lore:
+          - "<#d3d3d3>Use the button below to <#a6e3a1>Set Home."
+        # hide the vanilla tooltip for this item
+        hide-tooltip: false
+      locked:
+        # item shown when the slot is locked and empty
+        material: RED_BED
+        name: "<#f38ba8>🔒 Locked Home #%slot%"
+        lore:
+          - "<#d3d3d3>This home slot is locked."
+        # hide the vanilla tooltip for this item
+        hide-tooltip: false
+      locked-set:
+        # item shown when a home exists but permission is missing
+        material: RED_BED
+        name: "<#f38ba8>🔒 Locked Home #%slot%"
+        lore:
+          - "<#d3d3d3>This home slot is locked as"
+          - "<#d3d3d3>you lost the required permission."
+        # hide the vanilla tooltip for this item
+        hide-tooltip: false
+      action-set:
+        # action button shown when no home is set
+        material: GRAY_DYE
+        name: "<#7f849c>Set Home #%slot%"
+        lore:
+          - "<#d3d3d3>Left-Click to <#a6e3a1>Set Home."
+        hide-tooltip: false
+      action-delete:
+        # action button shown when a home is set
+        material: LIME_DYE
+        name: "<#a6e3a1>Delete Home #%slot%"
+        lore:
+          - "<#d3d3d3>Left-Click to <#f38ba8>Delete Home."
+        hide-tooltip: false
+      action-delete-confirm:
+        # action button shown after first delete click
+        material: RED_DYE
+        name: "<#f38ba8>Click Again to Delete"
+        lore:
+          - "<#d3d3d3>Confirm deletion for Home #%slot%."
+        hide-tooltip: false
+      action-locked:
+        # action button shown when slot is locked
+        material: GRAY_DYE
+        name: "<#7f849c>Home #%slot% Locked"
+        lore:
+          - "<#d3d3d3>You cannot use this slot."
+        hide-tooltip: false

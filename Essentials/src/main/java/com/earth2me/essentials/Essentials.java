@@ -597,7 +597,10 @@ public class Essentials extends JavaPlugin implements net.ess3.api.IEssentials {
         }
 
         if (getSettings().isHomeGuiEnabled()) {
-            final HomeGuiHandler homeGuiHandler = new HomeGuiHandler(this);
+            final EssentialsConfiguration homeGuiConfig = new EssentialsConfiguration(
+                    new File(getDataFolder(), "gui" + File.separator + "homes.yml"), "/gui/homes.yml");
+            homeGuiConfig.load();
+            final HomeGuiHandler homeGuiHandler = new HomeGuiHandler(this, homeGuiConfig);
             pm.registerEvents(homeGuiHandler, this);
             this.homeGuiHandler = homeGuiHandler;
         } else {
@@ -1393,8 +1396,8 @@ public class Essentials extends JavaPlugin implements net.ess3.api.IEssentials {
             taskLock.complete(new Object());
         });
         try {
-            taskLock.get();
-        } catch (InterruptedException | ExecutionException e) {
+            taskLock.get(2, java.util.concurrent.TimeUnit.SECONDS);
+        } catch (InterruptedException | ExecutionException | java.util.concurrent.TimeoutException e) {
             throw new RuntimeException(e);
         }
     }
@@ -1412,8 +1415,8 @@ public class Essentials extends JavaPlugin implements net.ess3.api.IEssentials {
             taskLock.complete(new Object());
         });
         try {
-            taskLock.get();
-        } catch (InterruptedException | ExecutionException e) {
+            taskLock.get(2, java.util.concurrent.TimeUnit.SECONDS);
+        } catch (InterruptedException | ExecutionException | java.util.concurrent.TimeoutException e) {
             throw new RuntimeException(e);
         }
     }
@@ -1431,8 +1434,8 @@ public class Essentials extends JavaPlugin implements net.ess3.api.IEssentials {
             taskLock.complete(new Object());
         });
         try {
-            taskLock.get();
-        } catch (InterruptedException | ExecutionException e) {
+            taskLock.get(2, java.util.concurrent.TimeUnit.SECONDS);
+        } catch (InterruptedException | ExecutionException | java.util.concurrent.TimeoutException e) {
             throw new RuntimeException(e);
         }
     }

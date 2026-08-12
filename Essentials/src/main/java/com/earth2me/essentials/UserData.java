@@ -183,6 +183,15 @@ public abstract class UserData extends PlayerExtension implements IConf {
         config.save();
     }
 
+    public Integer getHomeSlot(final String name) {
+        return holder.homeSlots().get(name);
+    }
+
+    public void setHomeSlot(final String name, final int slot) {
+        holder.homeSlots().put(name, slot);
+        config.save();
+    }
+
     public void delHome(final String name) throws Exception {
         String search = getHomeName(name);
         if (!holder.homes().containsKey(search)) {
@@ -190,6 +199,7 @@ public abstract class UserData extends PlayerExtension implements IConf {
         }
         if (holder.homes().containsKey(search)) {
             holder.homes().remove(search);
+            holder.homeSlots().remove(search);
             config.save();
         } else {
             throw new TranslatableException("invalidHome", search);
@@ -201,6 +211,10 @@ public abstract class UserData extends PlayerExtension implements IConf {
         if (location != null) {
             final String safeNew = StringUtil.safeString(newName);
             holder.homes().put(safeNew, location);
+            final Integer slot = holder.homeSlots().remove(name);
+            if (slot != null) {
+                holder.homeSlots().put(safeNew, slot);
+            }
             config.save();
         } else {
             throw new TranslatableException("invalidHome", name);

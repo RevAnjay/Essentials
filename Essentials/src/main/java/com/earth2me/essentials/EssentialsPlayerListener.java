@@ -729,12 +729,12 @@ public class EssentialsPlayerListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerTeleport(final PlayerTeleportEvent event) {
         final Player player = event.getPlayer();
-        if (player.hasMetadata("NPC") || !(event.getCause() == TeleportCause.PLUGIN || event.getCause() == TeleportCause.COMMAND)) {
+        if (player.hasMetadata("NPC") || player.isDead() || !(event.getCause() == TeleportCause.PLUGIN || event.getCause() == TeleportCause.COMMAND)) {
             return;
         }
         final User user = ess.getUser(player);
-        if (ess.getSettings().registerBackInListener() && user.isAuthorized("essentials.back.onteleport")) {
-            user.setLastLocation();
+        if (ess.getSettings().registerBackInListener() && AsyncTeleport.canRegisterBackLocation(user)) {
+            user.setLastLocation(event.getFrom());
         }
         if (ess.getSettings().isTeleportInvulnerability()) {
             user.enableInvulnerabilityAfterTeleport();

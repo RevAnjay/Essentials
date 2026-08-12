@@ -158,6 +158,10 @@ public interface IUser {
 
     void setHome(String name, Location loc);
 
+    Integer getHomeSlot(String name);
+
+    void setHomeSlot(String name, int slot);
+
     void delHome(String name) throws Exception;
 
     void renameHome(String name, String newName) throws Exception;

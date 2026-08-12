@@ -47,6 +47,20 @@ public class UserConfigHolder {
         this.homes = value;
     }
 
+    @DeleteOnEmpty
+    private @MonotonicNonNull Map<String, Integer> homeSlots;
+
+    public Map<String, Integer> homeSlots() {
+        if (this.homeSlots == null) {
+            this.homeSlots = new HashMap<>();
+        }
+        return this.homeSlots;
+    }
+
+    public void homeSlots(final Map<String, Integer> value) {
+        this.homeSlots = value;
+    }
+
     private boolean homeGuiEnabled;
 
     public boolean homeGuiEnabled() {
