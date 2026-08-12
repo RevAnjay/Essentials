@@ -185,11 +185,8 @@ public class HomeGuiHandler implements Listener {
         try {
             Player.class.getMethod("showDialog", Dialog.class);
             return true;
-        } catch (final NoSuchMethodException e) {
-            ess.getLogger().warning("Dialog API not available: Player.showDialog method not found");
-            return false;
-        } catch (final NoClassDefFoundError e) {
-            ess.getLogger().warning("Dialog API not available: " + e.getMessage());
+        } catch (final Throwable e) {
+            ess.getLogger().warning("Dialog API not available: " + e.getClass().getName() + ": " + e.getMessage());
             return false;
         }
     }
