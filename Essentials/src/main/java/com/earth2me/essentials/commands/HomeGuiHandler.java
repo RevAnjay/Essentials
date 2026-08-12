@@ -173,7 +173,7 @@ public class HomeGuiHandler implements Listener {
             } else if (hasDialogSupport(player)) {
                 openJavaHomeList(target);
             } else {
-                openJavaInventoryHomeList(target, 0, readOnly);
+                openJavaInventoryHomeList(viewer, target, 0, readOnly);
             }
         } catch (final Throwable t) {
             ess.getLogger().severe("Failed to open home GUI: " + t.getMessage());
@@ -356,11 +356,11 @@ public class HomeGuiHandler implements Listener {
     // Inventory GUI (Jossentials-style)
     // ------------------------------------------------------------------
     void openJavaInventoryHomeList(final User user, final int page) {
-        openJavaInventoryHomeList(user, page, false);
+        openJavaInventoryHomeList(user, user, page, false);
     }
 
-    void openJavaInventoryHomeList(final User user, final int page, final boolean readOnly) {
-        final Player player = user.getBase();
+    void openJavaInventoryHomeList(final User viewer, final User target, final int page, final boolean readOnly) {
+        final Player player = viewer.getBase();
         if (player == null) return;
         try {
             final int maxSlots = guiConfig != null ? guiConfig.getInt("homes.max-slots", 10) : 10;
@@ -374,14 +374,14 @@ public class HomeGuiHandler implements Listener {
             final Component titleComp = parseText(rawTitle.replace("%page%", String.valueOf(currentPage + 1)), 1, null);
 
             final HomeGuiHolder holder = new HomeGuiHolder(guiSize, titleComp, currentPage, pages.size(),
-                    user.getBase().getUniqueId(), readOnly);
+                    target.getBase().getUniqueId(), readOnly);
             final Inventory inv = holder.getInventory();
 
             // Fill ingredient slots (characters in structure that are not H/A/P/N)
             fillIngredients(inv, pdef);
 
             // Resolve home names for slots on this page
-            final String[] slotHomeNames = resolveSlotHomeNames(user, maxSlots);
+            final String[] slotHomeNames = resolveSlotHomeNames(target, maxSlots);
 
             // Track which absolute slot numbers appear on this page
             final int slotsThisPage = Math.min(pdef.homeSlots.size(), maxSlots - pdef.startSlot);
@@ -394,7 +394,7 @@ public class HomeGuiHandler implements Listener {
                 final int hSlot = pdef.homeSlots.get(i);
                 final String homeName = slotHomeNames[pdef.startSlot + i];
                 final boolean set = homeName != null;
-                final boolean hasPermission = readOnly || user.isAuthorized("essentials.home");
+                final boolean hasPermission = readOnly || target.isAuthorized("essentials.home");
 
                 final String keyPath;
                 if (set && !hasPermission) {
@@ -574,11 +574,11 @@ public class HomeGuiHandler implements Listener {
 
         // Check navigation clicks first
         if (pdef.prevSlots.contains(rawSlot)) {
-            if (guiHolder.getPage() > 0) openJavaInventoryHomeList(user, guiHolder.getPage() - 1, guiHolder.isReadOnly());
+            if (guiHolder.getPage() > 0) openJavaInventoryHomeList(viewer, user, guiHolder.getPage() - 1, guiHolder.isReadOnly());
             return;
         }
         if (pdef.nextSlots.contains(rawSlot)) {
-            if (guiHolder.getPage() + 1 < pages.size()) openJavaInventoryHomeList(user, guiHolder.getPage() + 1, guiHolder.isReadOnly());
+            if (guiHolder.getPage() + 1 < pages.size()) openJavaInventoryHomeList(viewer, user, guiHolder.getPage() + 1, guiHolder.isReadOnly());
             return;
         }
 
