@@ -19,6 +19,9 @@ public class Commandmsg extends EssentialsLoopCommand {
 
     @Override
     public void run(final Server server, final CommandSource sender, final String commandLabel, final String[] args) throws Exception {
+        if (!ess.getSettings().isMsgEnabled()) {
+            throw new TranslatableException("msgFeatureDisabled");
+        }
         if (args.length < 2) {
             throw new NotEnoughArgumentsException();
         }

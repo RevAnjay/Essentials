@@ -351,6 +351,14 @@ disabled-commands:
   #- nick
   #- clear
 
+# Set to false to disable Essentials' messaging features (msg, reply, tell, afk, ignore, socialspy, etc.)
+# Useful when using a separate chat plugin like SimpleMSG to handle messaging.
+msg-enabled: true
+
+# Set to false to disable Essentials' economy features (pay, balance, balancetop, eco, sell, worth, etc.)
+# Useful when using a separate economy plugin like CoinsEngine, PlayerPoints to handle economy.
+economy-enabled: true
+
 # Whether Essentials should show detailed command usages.
 # If set to false, Essentials will collapse all usages in to one single usage message.
 verbose-command-usages: true

@@ -463,6 +463,16 @@ public class Settings implements net.ess3.api.ISettings {
                 disCommands.add(c.substring(8).toLowerCase(Locale.ENGLISH));
             }
         }
+        if (!config.getBoolean("msg-enabled", true)) {
+            for (final String c : new String[]{"msg", "msgtoggle", "r", "reply", "w", "tell", "whisper", "action", "describe", "me", "afk", "ignore", "socialspy", "realname"}) {
+                disCommands.add(c);
+            }
+        }
+        if (!config.getBoolean("economy-enabled", true)) {
+            for (final String c : new String[]{"pay", "paytoggle", "payconfirmtoggle", "balance", "bal", "balancetop", "baltop", "eco", "economy", "sell", "worth", "setworth"}) {
+                disCommands.add(c);
+            }
+        }
         return disCommands;
     }
 
@@ -1541,6 +1551,16 @@ public class Settings implements net.ess3.api.ISettings {
     @Override
     public boolean isWorldHomePermissions() {
         return config.getBoolean("world-home-permissions", false);
+    }
+
+    @Override
+    public boolean isMsgEnabled() {
+        return config.getBoolean("msg-enabled", true);
+    }
+
+    @Override
+    public boolean isEconomyEnabled() {
+        return config.getBoolean("economy-enabled", true);
     }
 
     @Override

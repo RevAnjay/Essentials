@@ -171,6 +171,26 @@ public class UserConfigHolder {
         this.teleportauto = value;
     }
 
+    private boolean tparequestsenabled = true;
+
+    public boolean tpaRequestsEnabled() {
+        return this.tparequestsenabled;
+    }
+
+    public void tpaRequestsEnabled(final boolean value) {
+        this.tparequestsenabled = value;
+    }
+
+    private boolean tpahererequestsenabled = true;
+
+    public boolean tpaHereRequestsEnabled() {
+        return this.tpahererequestsenabled;
+    }
+
+    public void tpaHereRequestsEnabled(final boolean value) {
+        this.tpahererequestsenabled = value;
+    }
+
     @DeleteOnEmpty
     private @MonotonicNonNull List<UUID> ignore;
 

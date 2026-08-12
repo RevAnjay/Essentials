@@ -29,6 +29,9 @@ public class Commandtpahere extends EssentialsCommand {
         if (!player.isTeleportEnabled()) {
             throw new TranslatableException("teleportDisabled", player.getDisplayName());
         }
+        if (!player.isTpaHereRequestsEnabled()) {
+            throw new TranslatableException("tpaHereRequestsDisabled", player.getDisplayName());
+        }
         if (user.getWorld() != player.getWorld() && ess.getSettings().isWorldTeleportPermissions() && !user.isAuthorized("essentials.worlds." + user.getWorld().getName())) {
             throw new TranslatableException("noPerm", "essentials.worlds." + user.getWorld().getName());
         }

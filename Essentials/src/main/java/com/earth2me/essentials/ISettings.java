@@ -253,6 +253,10 @@ public interface ISettings extends IConf {
 
     boolean isWorldHomePermissions();
 
+    boolean isMsgEnabled();
+
+    boolean isEconomyEnabled();
+
     int getMaxTreeCommandRange();
 
     boolean registerBackInListener();

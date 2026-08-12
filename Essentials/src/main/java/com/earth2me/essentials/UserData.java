@@ -441,6 +441,24 @@ public abstract class UserData extends PlayerExtension implements IConf {
         config.save();
     }
 
+    public boolean isTpaRequestsEnabled() {
+        return holder.tpaRequestsEnabled();
+    }
+
+    public void setTpaRequestsEnabled(final boolean set) {
+        holder.tpaRequestsEnabled(set);
+        config.save();
+    }
+
+    public boolean isTpaHereRequestsEnabled() {
+        return holder.tpaHereRequestsEnabled();
+    }
+
+    public void setTpaHereRequestsEnabled(final boolean set) {
+        holder.tpaHereRequestsEnabled(set);
+        config.save();
+    }
+
     @Deprecated
     public void setIgnoredPlayers(final List<String> players) {
         final List<UUID> uuids = new ArrayList<>();

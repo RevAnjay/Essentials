@@ -661,6 +661,10 @@ commands:
     description: Request that the specified player teleport to you.
     usage: /<command> <player>
     aliases: [etpahere]
+  tpaheretoggle:
+    description: Toggle whether you accept TPAHere requests.
+    usage: /<command> [player] [on|off]
+    aliases: [etpaheretoggle]
   tpall:
     description: Teleport all online players to another player.
     usage: /<command> [player]
@@ -669,6 +673,10 @@ commands:
     description: Automatically accept teleportation requests.
     usage: /<command> [player]
     aliases: [etpauto]
+  tpatoggle:
+    description: Toggle whether you accept TPA requests.
+    usage: /<command> [player] [on|off]
+    aliases: [etpatoggle]
   tpacancel:
     description: Cancel all outstanding teleport requests. Specify [player] to cancel requests with them.
     usage: /<command> [player]
@@ -1434,6 +1442,10 @@ permissions:
     description: Allows access to the /tpauto command
   essentials.tpauto.others:
     description: Allows access to the /tpauto command for other players
+  essentials.tpatoggle:
+    description: Allows access to the /tpatoggle command
+  essentials.tpatoggle.others:
+    description: Allows access to the /tpatoggle command for other players
   essentials.tp.others:
     description: Allows access to teleporting to other users with the /tp command
   essentials.tp.position:
@@ -1450,6 +1462,10 @@ permissions:
     description: Allows access to the /tpaccept command
   essentials.tpahere:
     description: Allows access to the /tpahere command
+  essentials.tpaheretoggle:
+    description: Allows access to the /tpaheretoggle command
+  essentials.tpaheretoggle.others:
+    description: Allows access to the /tpaheretoggle command for other players
   essentials.tpall:
     description: Allows access to the /tpall command
   essentials.tpdeny:
