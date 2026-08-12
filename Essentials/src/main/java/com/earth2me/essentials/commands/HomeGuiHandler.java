@@ -185,7 +185,13 @@ public class HomeGuiHandler implements Listener {
         try {
             Player.class.getMethod("showDialog", Dialog.class);
             return true;
-        } catch (final NoSuchMethodException | NoClassDefFoundError ignored) { return false; }
+        } catch (final NoSuchMethodException e) {
+            ess.getLogger().warning("Dialog API not available: Player.showDialog method not found");
+            return false;
+        } catch (final NoClassDefFoundError e) {
+            ess.getLogger().warning("Dialog API not available: " + e.getMessage());
+            return false;
+        }
     }
 
     // ------------------------------------------------------------------
@@ -474,7 +480,7 @@ public class HomeGuiHandler implements Listener {
             final String row = pdef.structure.get(r).replace(" ", "");
             for (int c = 0; c < row.length() && c < 9; c++) {
                 final char ch = row.charAt(c);
-                if (ch == 'H' || ch == 'A' || ch == 'P' || ch == 'N') continue;
+                if (ch == 'H' || ch == 'A' || ch == 'P' || ch == 'N' || ch == '.') continue;
                 if (ingredientPaths.containsKey(ch)) continue;
                 // Try page-specific ingredient, then global
                 final String pageIngPath = pdef.path + ".ingredients." + ch;
@@ -491,7 +497,7 @@ public class HomeGuiHandler implements Listener {
             final String row = pdef.structure.get(r).replace(" ", "");
             for (int c = 0; c < row.length() && c < 9; c++) {
                 final char ch = row.charAt(c);
-                if (ch == 'H' || ch == 'A' || ch == 'P' || ch == 'N') continue;
+                if (ch == 'H' || ch == 'A' || ch == 'P' || ch == 'N' || ch == '.') continue;
                 final int rawSlot = r * 9 + c;
                 final String ingPath = ingredientPaths.get(ch);
                 if (ingPath != null) {
