@@ -907,41 +907,42 @@ public class EssentialsPlayerListener implements Listener {
     public void onPlayerChangedWorldFlyReset(final PlayerChangedWorldEvent event) {
         final User user = ess.getUser(event.getPlayer());
 
-        if (ess.getSettings().isWorldChangeFlyResetEnabled()) {
-            if (user.getBase().getGameMode() != GameMode.CREATIVE
-                && user.getBase().getGameMode() != GameMode.SPECTATOR
-                && !user.isAuthorized("essentials.fly")) {
-                user.getBase().setFallDistance(0f);
-                user.getBase().setAllowFlight(false);
+        ess.scheduleEntityDelayedTask(event.getPlayer(), () -> {
+            if (ess.getSettings().isWorldChangeFlyResetEnabled()) {
+                if (user.getBase().getGameMode() != GameMode.CREATIVE
+                    && user.getBase().getGameMode() != GameMode.SPECTATOR
+                    && !user.isAuthorized("essentials.fly")) {
+                    user.getBase().setFallDistance(0f);
+                    user.getBase().setAllowFlight(false);
+                }
             }
-        }
 
-        if (ess.getSettings().isWorldChangeSpeedResetEnabled()) {
-            if (!user.isAuthorized("essentials.speed")) {
-                user.getBase().setFlySpeed(0.1f);
-                user.getBase().setWalkSpeed(0.2f);
-            } else {
-                if (user.getBase().getFlySpeed() > ess.getSettings().getMaxFlySpeed() && !user.isAuthorized("essentials.speed.bypass")) {
-                    user.getBase().setFlySpeed((float) ess.getSettings().getMaxFlySpeed());
+            if (ess.getSettings().isWorldChangeSpeedResetEnabled()) {
+                if (!user.isAuthorized("essentials.speed")) {
+                    user.getBase().setFlySpeed(0.1f);
+                    user.getBase().setWalkSpeed(0.2f);
                 } else {
-                    user.getBase().setFlySpeed(user.getBase().getFlySpeed() * 0.99999f);
-                }
+                    if (user.getBase().getFlySpeed() > ess.getSettings().getMaxFlySpeed() && !user.isAuthorized("essentials.speed.bypass")) {
+                        user.getBase().setFlySpeed((float) ess.getSettings().getMaxFlySpeed());
+                    } else {
+                        user.getBase().setFlySpeed(user.getBase().getFlySpeed() * 0.99999f);
+                    }
 
-                if (user.getBase().getWalkSpeed() > ess.getSettings().getMaxWalkSpeed() && !user.isAuthorized("essentials.speed.bypass")) {
-                    user.getBase().setWalkSpeed((float) ess.getSettings().getMaxWalkSpeed());
+                    if (user.getBase().getWalkSpeed() > ess.getSettings().getMaxWalkSpeed() && !user.isAuthorized("essentials.speed.bypass")) {
+                        user.getBase().setWalkSpeed((float) ess.getSettings().getMaxWalkSpeed());
+                    }
                 }
             }
-        }
-
-        final TickCountProvider tickCountProvider = ess.provider(TickCountProvider.class);
-        final int flightTick = user.getFlightTick();
-        if (tickCountProvider != null && Math.abs(flightTick) == tickCountProvider.getTickCount() && user.isAuthorized("essentials.fly")) {
-            user.getBase().setAllowFlight(true);
-            if (flightTick > 0) {
-                user.getBase().setFlying(true);
+            final TickCountProvider tickCountProvider = ess.provider(TickCountProvider.class);
+            final int flightTick = user.getFlightTick();
+            if (tickCountProvider != null && Math.abs(flightTick) == tickCountProvider.getTickCount() && user.isAuthorized("essentials.fly")) {
+                user.getBase().setAllowFlight(true);
+                if (flightTick > 0) {
+                    user.getBase().setFlying(true);
+                }
             }
-        }
-        user.setFlightTick(-1);
+            user.setFlightTick(-1);
+        });
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
