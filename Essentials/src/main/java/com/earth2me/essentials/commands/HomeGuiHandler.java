@@ -183,29 +183,34 @@ public class HomeGuiHandler implements Listener {
 
     private boolean hasDialogSupport(final Player player) {
         // Check if Dialog class itself is available first
-        Class<?> dialogClass;
         try {
-            dialogClass = Class.forName("io.papermc.paper.dialog.Dialog");
+            Class.forName("io.papermc.paper.dialog.Dialog");
         } catch (final ClassNotFoundException e) {
             ess.getLogger().warning("Dialog API not available: io.papermc.paper.dialog.Dialog class not found");
             return false;
         }
-        // Scan Player class for any method containing "dialog" (showDialog, openDialog, sendDialog, etc.)
-        final java.lang.reflect.Method[] methods = Player.class.getMethods();
-        for (final java.lang.reflect.Method m : methods) {
-            if (m.getName().toLowerCase(Locale.ROOT).contains("dialog")) {
-                ess.getLogger().info("Dialog API found: Player." + m.getName() + "(" + m.getParameterCount() + " params)");
-                return true;
+        // Scan actual player runtime class AND all interfaces for any method containing "dialog"
+        final Class<?> playerClass = player.getClass();
+        final java.util.Set<Class<?>> toCheck = new java.util.LinkedHashSet<>();
+        collectClasses(playerClass, toCheck);
+        for (final Class<?> clazz : toCheck) {
+            for (final java.lang.reflect.Method m : clazz.getDeclaredMethods()) {
+                if (m.getName().toLowerCase(Locale.ROOT).contains("dialog")) {
+                    ess.getLogger().info("Dialog API found: " + clazz.getSimpleName() + "." + m.getName() + "(" + m.getParameterCount() + " params)");
+                    return true;
+                }
             }
         }
-        ess.getLogger().warning("Dialog API not available: Dialog class exists but no dialog method found on Player. Available Player methods with 'dialog': none");
-        try {
-            Player.class.getMethod("showDialog", Dialog.class);
-            return true;
-        } catch (final Throwable e) {
-            ess.getLogger().warning("Dialog API not available: " + e.getClass().getName() + ": " + e.getMessage());
-            return false;
+        ess.getLogger().warning("Dialog API not available: Dialog class exists but no 'dialog' method found on " + playerClass.getName() + " or its interfaces");
+        return false;
+    }
+
+    private static void collectClasses(final Class<?> clazz, final java.util.Set<Class<?>> out) {
+        if (clazz == null || !out.add(clazz)) return;
+        for (final Class<?> iface : clazz.getInterfaces()) {
+            collectClasses(iface, out);
         }
+        collectClasses(clazz.getSuperclass(), out);
     }
 
     // ------------------------------------------------------------------
