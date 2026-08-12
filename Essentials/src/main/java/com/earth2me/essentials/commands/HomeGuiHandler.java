@@ -182,6 +182,23 @@ public class HomeGuiHandler implements Listener {
     }
 
     private boolean hasDialogSupport(final Player player) {
+        // Check if Dialog class itself is available first
+        Class<?> dialogClass;
+        try {
+            dialogClass = Class.forName("io.papermc.paper.dialog.Dialog");
+        } catch (final ClassNotFoundException e) {
+            ess.getLogger().warning("Dialog API not available: io.papermc.paper.dialog.Dialog class not found");
+            return false;
+        }
+        // Scan Player class for any method containing "dialog" (showDialog, openDialog, sendDialog, etc.)
+        final java.lang.reflect.Method[] methods = Player.class.getMethods();
+        for (final java.lang.reflect.Method m : methods) {
+            if (m.getName().toLowerCase(Locale.ROOT).contains("dialog")) {
+                ess.getLogger().info("Dialog API found: Player." + m.getName() + "(" + m.getParameterCount() + " params)");
+                return true;
+            }
+        }
+        ess.getLogger().warning("Dialog API not available: Dialog class exists but no dialog method found on Player. Available Player methods with 'dialog': none");
         try {
             Player.class.getMethod("showDialog", Dialog.class);
             return true;
