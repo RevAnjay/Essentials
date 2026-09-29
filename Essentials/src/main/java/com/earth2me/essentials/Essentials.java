@@ -633,7 +633,7 @@ public class Essentials extends JavaPlugin implements net.ess3.api.IEssentials {
             LOGGER.log(Level.SEVERE, getAdventureFacet().miniToLegacy(tlLiteral("serverReloading")));
         }
 
-        if (!TESTING) {
+        if (!TESTING && getBackup() != null) {
             getBackup().setPendingShutdown(true);
         }
 
@@ -653,7 +653,7 @@ public class Essentials extends JavaPlugin implements net.ess3.api.IEssentials {
             }
         }
         cleanupOpenInventories();
-        if (!TESTING && getBackup().getTaskLock() != null && !getBackup().getTaskLock().isDone()) {
+        if (!TESTING && getBackup() != null && getBackup().getTaskLock() != null && !getBackup().getTaskLock().isDone()) {
             LOGGER.log(Level.SEVERE, getAdventureFacet().miniToLegacy(tlLiteral("backupInProgress")));
             getBackup().getTaskLock().join();
         }

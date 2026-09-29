@@ -39,8 +39,12 @@ public class EssentialsPluginListener implements Listener, IConf {
         if (event.getPlugin().getName().equals("EssentialsChat")) {
             ess.getSettings().setEssentialsChatActive(false);
         }
-        ess.getPermissionsHandler().checkPermissions();
-        ess.getAlternativeCommandsHandler().removePlugin(event.getPlugin());
+        if (ess.getPermissionsHandler() != null) {
+            ess.getPermissionsHandler().checkPermissions();
+        }
+        if (ess.getAlternativeCommandsHandler() != null) {
+            ess.getAlternativeCommandsHandler().removePlugin(event.getPlugin());
+        }
         if (EconomyLayers.onPluginDisable(event.getPlugin())) {
             final EconomyLayer layer = EconomyLayers.getSelectedLayer();
             if (layer != null) {
