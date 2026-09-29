@@ -15,10 +15,11 @@ import com.earth2me.essentials.utils.FormatUtil;
 import com.earth2me.essentials.utils.LocationUtil;
 import com.earth2me.essentials.utils.MaterialUtil;
 import com.earth2me.essentials.utils.VersionUtil;
-import io.papermc.lib.PaperLib;
 import io.papermc.paper.ban.BanListType;
 import io.papermc.paper.event.connection.configuration.AsyncPlayerConnectionConfigureEvent;
 import io.papermc.paper.event.player.PlayerServerFullCheckEvent;
+import io.canvasmc.canvas.event.EntityTeleportAsyncEvent;
+import io.canvasmc.canvas.event.PlayerPostRespawnAsyncEvent;
 import net.ess3.api.IEssentials;
 import net.ess3.api.events.AfkStatusChangeEvent;
 import net.ess3.provider.CommandSendListenerProvider;
@@ -41,6 +42,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.FormattedCommandAlias;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -64,7 +66,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -177,13 +178,8 @@ public class EssentialsPlayerListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
-    public void onPlayerRespawn(final InventoryCloseEvent event) {
-        final Player player = (Player) event.getPlayer();
-        if (event.getInventory().getType() != InventoryType.CRAFTING || !player.isDead() || !player.isOnline() || player.getHealth() > 0) {
-            return;
-        }
-
-        final User user = ess.getUser(player.getUniqueId());
+    public void onPlayerRespawn(final PlayerPostRespawnAsyncEvent event) {
+        final User user = ess.getUser(event.getPlayer());
         updateCompass(user);
         user.setDisplayNick();
 
@@ -429,13 +425,18 @@ public class EssentialsPlayerListener implements Listener {
 
         final String lastAccountName = user.getLastAccountName(); // For comparison
         user.setLastAccountName(user.getBase().getName());
+
+        final boolean newUsername = lastAccountName != null && !lastAccountName.equals(user.getBase().getName());
+
+        // If the Minecraft account name changed, reset the nickname so the old one doesn't persist
+        if (ess.getSettings().isResetNickOnNameChange() && newUsername && user.getNickname() != null) {
+            user.setNickname(null);
+        }
+
         user.setLastLogin(currentTime);
         user.setDisplayNick();
         updateCompass(user);
         user.setLeavingHidden(false);
-
-        // Check for new username. If they don't want the message, let's just say it's false.
-        final boolean newUsername = ess.getSettings().isCustomNewUsernameMessage() && lastAccountName != null && !lastAccountName.equals(user.getBase().getName());
 
         if (!ess.getVanishedPlayersNew().isEmpty() && !user.isAuthorized("essentials.vanish.see")) {
             for (final String p : ess.getVanishedPlayersNew()) {
@@ -462,7 +463,7 @@ public class EssentialsPlayerListener implements Listener {
         } else if (message == null || hideJoinQuitMessages()) {
             effectiveMessage = null;
         } else if (ess.getSettings().isCustomJoinMessage()) {
-            final String msg = (newUsername ? ess.getSettings().getCustomNewUsernameMessage() : ess.getSettings().getCustomJoinMessage())
+            final String msg = (newUsername && ess.getSettings().isCustomNewUsernameMessage() ? ess.getSettings().getCustomNewUsernameMessage() : ess.getSettings().getCustomJoinMessage())
                 .replace("{PLAYER}", user.getDisplayName()).replace("{USERNAME}", user.getName())
                 .replace("{UNIQUE}", NumberFormat.getInstance().format(ess.getUsers().getUserCount()))
                 .replace("{ONLINE}", NumberFormat.getInstance().format(ess.getOnlinePlayers().size()))
@@ -727,8 +728,12 @@ public class EssentialsPlayerListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onPlayerTeleport(final PlayerTeleportEvent event) {
-        final Player player = event.getPlayer();
+    public void onPlayerTeleport(final EntityTeleportAsyncEvent event) {
+        final Entity entity = event.getEntity();
+        if (!(entity instanceof Player)) {
+            return;
+        }
+        final Player player = (Player) entity;
         if (player.hasMetadata("NPC") || player.isDead() || !(event.getCause() == TeleportCause.PLUGIN || event.getCause() == TeleportCause.COMMAND)) {
             return;
         }
@@ -1028,7 +1033,7 @@ public class EssentialsPlayerListener implements Listener {
                     while (LocationUtil.isBlockDamaging(loc.getWorld(), loc.getBlockX(), loc.getBlockY() - 1, loc.getBlockZ())) {
                         loc.setY(loc.getY() + 1d);
                     }
-                    PaperLib.teleportAsync(user.getBase(), loc, TeleportCause.PLUGIN);
+                    user.getBase().teleportAsync(loc, TeleportCause.PLUGIN);
                 }
             }
 
