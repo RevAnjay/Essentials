@@ -237,6 +237,20 @@ public abstract class UserData extends PlayerExtension implements IConf {
         holder.homeGuiEnabled(enabled);
         config.save();
     }
+    
+    public String getHomeIcon(final String name) {
+        return holder.homeIcons().get(getHomeName(name));
+    }
+    
+    public void setHomeIcon(final String name, final String material) {
+        holder.homeIcons().put(getHomeName(name), StringUtil.safeString(material));
+        config.save();
+    }
+    
+    public void delHomeIcon(final String name) {
+        holder.homeIcons().remove(getHomeName(name));
+        config.save();
+    }
 
     public String getNickname() {
         return holder.nickname();

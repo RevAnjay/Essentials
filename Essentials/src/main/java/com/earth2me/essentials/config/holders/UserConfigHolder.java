@@ -60,17 +60,30 @@ public class UserConfigHolder {
     public void homeSlots(final Map<String, Integer> value) {
         this.homeSlots = value;
     }
-
     private boolean homeGuiEnabled;
-
+    
     public boolean homeGuiEnabled() {
         return homeGuiEnabled;
     }
-
+    
     public void homeGuiEnabled(final boolean enabled) {
         this.homeGuiEnabled = enabled;
     }
-
+    
+    @DeleteOnEmpty
+    private @MonotonicNonNull Map<String, String> homeIcons;
+    
+    public Map<String, String> homeIcons() {
+        if (this.homeIcons == null) {
+            this.homeIcons = new HashMap<>();
+        }
+        return this.homeIcons;
+    }
+    
+    public void homeIcons(final Map<String, String> value) {
+        this.homeIcons = value;
+    }
+    
     private @Nullable String nickname;
 
     public String nickname() {

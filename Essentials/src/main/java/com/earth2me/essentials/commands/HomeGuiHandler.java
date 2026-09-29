@@ -21,6 +21,7 @@ import net.essentialsx.api.v2.events.HomeModifyEvent;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.object.ObjectContents;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -729,6 +730,86 @@ public class HomeGuiHandler implements Listener {
     // ------------------------------------------------------------------
     // Paper Dialog GUI (when available)
     // ------------------------------------------------------------------
+    private static final java.util.Set<String> ITEM_SPRITES = new java.util.HashSet<>();
+    private static final java.util.Set<String> BLOCK_SPRITES = new java.util.HashSet<>();
+    private static final Map<String, String> MAPPED_SPRITES = new java.util.HashMap<>();
+    static {
+        try (final java.io.BufferedReader r = new java.io.BufferedReader(new java.io.InputStreamReader(
+                HomeGuiHandler.class.getResourceAsStream("/gui/sprite-index.txt"), java.nio.charset.StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = r.readLine()) != null) {
+                if (line.length() < 3) continue;
+                final char kind = line.charAt(0);
+                if (kind == 'i') {
+                    ITEM_SPRITES.add(line.substring(2));
+                } else if (kind == 'b') {
+                    BLOCK_SPRITES.add(line.substring(2));
+                } else if (kind == 'm') {
+                    final int eq = line.indexOf('=', 2);
+                    if (eq > 2) MAPPED_SPRITES.put(line.substring(2, eq), line.substring(eq + 1));
+                }
+            }
+        } catch (final Exception e) {
+            // Missing/unreadable index
+        }
+    }
+
+    private Component iconOnly(final String material) {
+        final Material mat = Material.matchMaterial(material);
+        if (mat == null) return null;
+        final String name = mat.name().toLowerCase(Locale.ROOT);
+        final String special = switch (name) {
+            case "clock" -> "clock_00";
+            case "compass" -> "compass_00";
+            case "crossbow" -> "crossbow_standby";
+            default -> null;
+        };
+        final String atlas;
+        final String sprite;
+        if (special != null) {
+            atlas = "minecraft:items";
+            sprite = "item/" + special;
+        } else if (ITEM_SPRITES.contains(name)) {
+            atlas = "minecraft:items";
+            sprite = "item/" + name;
+        } else if (BLOCK_SPRITES.contains(name)) {
+            atlas = "minecraft:blocks";
+            sprite = "block/" + name;
+        } else if (MAPPED_SPRITES.containsKey(name)) {
+            final String[] parts = MAPPED_SPRITES.get(name).split("\\|", 2);
+            atlas = parts[0];
+            sprite = parts[1];
+        } else {
+            return null;
+        }
+        try {
+            return Component.object(ObjectContents.sprite(Key.key(atlas), Key.key(sprite)));
+        } catch (final Throwable t) {
+            return null;
+        }
+    }
+
+    private Component iconButton(final String material, final String label, final NamedTextColor color) {
+        final Component icon = iconOnly(material);
+        final Component text = Component.text(label, color);
+        return icon == null ? text : icon.append(Component.space()).append(text);
+    }
+
+    private String homeIconOf(final User user, final String homeName) {
+        final String stored = user.getHomeIcon(homeName);
+        if (stored != null && Material.matchMaterial(stored) != null) {
+            return stored;
+        }
+        final String configured = guiConfig != null ? guiConfig.getString("homes.gui.items.set.material", "LIME_BED") : "LIME_BED";
+        return configured != null ? configured : "LIME_BED";
+    }
+
+    private Component homeIconComponent(final User user, final String homeName) {
+        final Component icon = iconOnly(homeIconOf(user, homeName));
+        final Component label = Component.text(homeName, NamedTextColor.GREEN);
+        return icon == null ? label : icon.append(Component.space()).append(label);
+    }
+
     void openJavaHomeList(final User user) {
         final Player player = user.getBase();
         if (player == null) return;
@@ -739,6 +820,9 @@ public class HomeGuiHandler implements Listener {
                 return;
             }
             final List<DialogBody> bodyList = new ArrayList<>();
+            // 3D bed item preview above the homes count.
+            bodyList.add(DialogBody.item(new ItemStack(Material.RED_BED))
+                    .showDecorations(false).showTooltip(false).build());
             bodyList.add(DialogBody.plainMessage(Component.text(
                     "You have " + user.getHomes().size() + "/" + maxHomes + " homes", NamedTextColor.GRAY)));
             final String[] slotHomeNames = resolveSlotHomeNames(user, maxHomes);
@@ -747,12 +831,12 @@ public class HomeGuiHandler implements Listener {
                 final String homeName = slotHomeNames[i];
                 if (homeName != null) {
                     buttons.add(ActionButton.create(
-                            Component.text(homeName, NamedTextColor.GREEN),
+                            homeIconComponent(user, homeName),
                             Component.text("Click to manage"), 200,
                             DialogAction.customClick(Key.key("essentials", "homegui/select/" + homeName), null)));
                 } else {
                     buttons.add(ActionButton.create(
-                            Component.text("Set Home #" + (i + 1), NamedTextColor.GRAY),
+                            iconButton("BARRIER", "Set Home #" + (i + 1), NamedTextColor.GRAY),
                             Component.text("Click to set home"), 200,
                             DialogAction.customClick(Key.key("essentials", "homegui/set/" + i), null)));
                 }
@@ -774,21 +858,26 @@ public class HomeGuiHandler implements Listener {
             bodyList.add(DialogBody.plainMessage(Component.text("Click an action below", NamedTextColor.GRAY)));
             final List<ActionButton> actions = new ArrayList<>();
             if (user.isAuthorized("essentials.home")) {
-                actions.add(ActionButton.create(Component.text("Teleport", NamedTextColor.GREEN), null, 100,
+                actions.add(ActionButton.create(iconButton("ENDER_PEARL", "Teleport", NamedTextColor.GREEN), null, 100,
                         DialogAction.customClick(Key.key("essentials", "homegui/teleport/" + homeName), null)));
             }
             if (user.isAuthorized("essentials.delhome")) {
-                actions.add(ActionButton.create(Component.text("Delete", NamedTextColor.RED), null, 100,
-                        DialogAction.customClick(Key.key("essentials", "homegui/delete/" + homeName), null)));
+                actions.add(ActionButton.create(iconButton("BARRIER", "Delete", NamedTextColor.RED), null, 100,
+                        DialogAction.customClick(Key.key("essentials", "homegui/confirmdelete/" + homeName), null)));
             }
             if (user.isAuthorized("essentials.renamehome")) {
-                actions.add(ActionButton.create(Component.text("Rename", NamedTextColor.AQUA), null, 100,
+                actions.add(ActionButton.create(iconButton("OAK_SIGN", "Rename", NamedTextColor.AQUA), null, 100,
                         DialogAction.customClick(Key.key("essentials", "homegui/rename/" + homeName), null)));
             }
+            actions.add(ActionButton.create(iconButton("PAINTING", "Change Icon", NamedTextColor.YELLOW), null, 100,
+                    DialogAction.customClick(Key.key("essentials", "homegui/icon/" + homeName), null)));
             if (actions.isEmpty()) {
                 user.sendTl("errorWithMessage", "You do not have permission to perform any home actions.");
                 return;
             }
+            // Back button returns to the home list.
+            actions.add(ActionButton.create(iconButton("ARROW", "Back", NamedTextColor.GRAY), null, 100,
+                    DialogAction.customClick(Key.key("essentials", "homegui/list"), null)));
             showDialog(player, Component.text("Home: " + homeName), bodyList, actions);
         } catch (final Throwable t) {
             ess.getLogger().severe("Failed to open Java action dialog: " + t.getMessage());
@@ -810,6 +899,52 @@ public class HomeGuiHandler implements Listener {
         }
     }
 
+    private static List<String> iconChoices() {
+        final List<String> out = new ArrayList<>();
+        for (final Material m : Material.values()) {
+            if (!m.isItem()) continue;
+            final String n = m.name().toLowerCase(Locale.ROOT);
+            if (n.contains("wall_sign") || n.contains("banner_pattern") || n.contains("smithing_template") || n.contains("air")) continue;
+            out.add(m.name());
+        }
+        return out;
+    }
+    void openJavaIconDialog(final User user, final String homeName, final String query) {
+        if (!user.hasHome(homeName)) return;
+        final Player player = user.getBase();
+        if (player == null) return;
+        try {
+            final String q = query == null ? "" : query.trim().toLowerCase(Locale.ROOT);
+            final List<DialogBody> bodyList = new ArrayList<>();
+            bodyList.add(DialogBody.plainMessage(Component.text("Search for an icon, or pick one below", NamedTextColor.GRAY)));
+            final DialogInput searchInput = DialogInput.text("search", Component.text("Search icon")).build();
+            final List<ActionButton> buttons = new ArrayList<>();
+            // Search and Back buttons appear first, right below the search bar
+            buttons.add(ActionButton.create(
+                    iconButton("SPYGLASS", "Search", NamedTextColor.GREEN), null, 100,
+                    DialogAction.customClick(Key.key("essentials", "homegui/iconsearch/" + homeName), null)));
+            buttons.add(ActionButton.create(
+                    iconButton("ARROW", "Back", NamedTextColor.RED), null, 100,
+                    DialogAction.customClick(Key.key("essentials", "homegui/select/" + homeName), null)));
+            for (final String material : iconChoices()) {
+                if (!q.isEmpty() && !material.toLowerCase(Locale.ROOT).contains(q)) continue;
+                final Material mm = Material.matchMaterial(material);
+                final ActionButton pick = ActionButton.create(
+                        iconButton(material, material.replace('_', ' ').toLowerCase(Locale.ROOT), NamedTextColor.WHITE),
+                        Component.text("Set as icon"), 200,
+                        DialogAction.customClick(Key.key("essentials", "homegui/doicon/" + homeName + "/" + material.toLowerCase(Locale.ROOT)), null));
+                buttons.add(pick);
+            }
+            if (buttons.size() <= 2) {
+                bodyList.add(DialogBody.plainMessage(Component.text("No icons match \"" + q + "\"", NamedTextColor.RED)));
+            }
+            showSearchDialog(player, Component.text("Change Icon"), bodyList, searchInput, buttons);
+        } catch (final Throwable t) {
+            ess.getLogger().severe("Failed to open Java icon dialog: " + t.getMessage());
+            t.printStackTrace();
+        }
+    }
+
     @EventHandler
     public void onPlayerCustomClick(final PlayerCustomClickEvent event) {
         try {
@@ -826,7 +961,9 @@ public class HomeGuiHandler implements Listener {
             final String arg = slashIdx > 0 ? action.substring(slashIdx + 1) : "";
             final DialogResponseView view = event.getDialogResponseView();
 
-            if ("select".equals(op)) {
+            if ("list".equals(op)) {
+                openJavaHomeList(user);
+            } else if ("select".equals(op)) {
                 if (isSafeGuiHomeName(arg) && user.hasHome(arg)) openJavaActionDialog(user, arg);
                 else { user.sendTl("invalidHome", arg); openJavaHomeList(user); }
             } else if ("set".equals(op)) {
@@ -839,6 +976,9 @@ public class HomeGuiHandler implements Listener {
                 if (isSafeGuiHomeName(arg) && user.hasHome(arg)) doDeleteHome(user, arg);
                 else user.sendTl("invalidHome", arg);
                 openJavaHomeList(user);
+            } else if ("confirmdelete".equals(op)) {
+                if (isSafeGuiHomeName(arg) && user.hasHome(arg)) openJavaDeleteConfirmDialog(user, arg);
+                else { user.sendTl("invalidHome", arg); openJavaHomeList(user); }
             } else if ("rename".equals(op)) {
                 if (isSafeGuiHomeName(arg) && user.hasHome(arg)) openJavaRenameDialog(user, arg);
                 else { user.sendTl("invalidHome", arg); openJavaHomeList(user); }
@@ -849,6 +989,27 @@ public class HomeGuiHandler implements Listener {
                     else user.sendTl("invalidHome", arg);
                 }
                 openJavaHomeList(user);
+            } else if ("icon".equals(op)) {
+                if (isSafeGuiHomeName(arg) && user.hasHome(arg)) openJavaIconDialog(user, arg, null);
+                else { user.sendTl("invalidHome", arg); openJavaHomeList(user); }
+            } else if ("iconsearch".equals(op)) {
+                final String query = view != null ? view.getText("search") : null;
+                if (isSafeGuiHomeName(arg) && user.hasHome(arg)) openJavaIconDialog(user, arg, query);
+                else { user.sendTl("invalidHome", arg); openJavaHomeList(user); }
+            } else if ("doicon".equals(op)) {
+                final int i = arg.indexOf('/');
+                if (i > 0) {
+                    final String hname = arg.substring(0, i);
+                    final String material = arg.substring(i + 1).toUpperCase(Locale.ROOT);
+                    if (isSafeGuiHomeName(hname) && user.hasHome(hname) && Material.matchMaterial(material) != null) {
+                        user.setHomeIcon(hname, material);
+                        user.sendTl("homeIconSet", material);
+                        openJavaActionDialog(user, hname);
+                    } else {
+                        user.sendTl("invalidHome", hname);
+                        openJavaHomeList(user);
+                    }
+                }
             }
         } catch (final Throwable t) {
             ess.getLogger().severe("Failed to handle Java dialog action: " + t.getMessage());
@@ -1072,6 +1233,21 @@ public class HomeGuiHandler implements Listener {
             user.sendTl("errorWithMessage", ex.getMessage());
         }
     }
+    void openJavaDeleteConfirmDialog(final User user, final String homeName) {
+        if (!user.hasHome(homeName)) { openJavaHomeList(user); return; }
+        final Player player = user.getBase();
+        if (player == null) return;
+        final List<DialogBody> bodyList = new ArrayList<>();
+        bodyList.add(DialogBody.plainMessage(Component.text("Are you sure you want to delete this home?", NamedTextColor.GRAY)));
+        final List<ActionButton> buttons = new ArrayList<>();
+        buttons.add(ActionButton.create(
+                iconButton("BARRIER", "Delete", NamedTextColor.RED), null, 100,
+                DialogAction.customClick(Key.key("essentials", "homegui/delete/" + homeName), null)));
+        buttons.add(ActionButton.create(
+                iconButton("ARROW", "Cancel", NamedTextColor.GRAY), null, 100,
+                DialogAction.customClick(Key.key("essentials", "homegui/list"), null)));
+        showDialog(player, Component.text("Delete Home: " + homeName), bodyList, buttons);
+    }
 
     void doRenameHome(final User user, final String oldName, final String newName) {
         if (!user.hasHome(oldName) || newName == null || newName.trim().isEmpty()) return;
@@ -1141,6 +1317,11 @@ public class HomeGuiHandler implements Listener {
         player.showDialog(Dialog.create(factory -> factory.empty().base(base).type(type)));
     }
 
+    private static void showSearchDialog(final Player player, final Component title, final List<DialogBody> bodyList, final DialogInput searchInput, final List<ActionButton> buttons) {
+        final DialogType type = DialogType.multiAction(buttons).build();
+        final DialogBase base = DialogBase.builder(title).body(bodyList).inputs(List.of(searchInput)).build();
+        player.showDialog(Dialog.create(factory -> factory.empty().base(base).type(type)));
+    }
     // ------------------------------------------------------------------
     // Floodgate reflection
     // ------------------------------------------------------------------
